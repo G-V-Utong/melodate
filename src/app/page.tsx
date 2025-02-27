@@ -9,6 +9,7 @@ import { Search } from "lucide-react";
 import SearchBar from "@/components/search-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicGrid from "@/components/music-grid";
+import LoginModal from "@/components/login-modal";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -148,7 +149,7 @@ export default function Home() {
         </Tabs>
       </div>
     </main>
-
+    <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     <footer className="border-t bg-muted/40">
       <div className="container py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">

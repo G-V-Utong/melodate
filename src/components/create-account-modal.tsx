@@ -16,26 +16,27 @@ import {
 } from "@/components/ui/dialog"
 import { Separator } from "@/components/ui/separator"
 
-interface LoginModalProps {
+interface CreateAccountModalProps {
   isOpen: boolean
   onClose: () => void
-  onSwitchToCreateAccount: () => void
+  onSwitchToLogin: () => void
 }
 
-export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }: LoginModalProps) {
+export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }: CreateAccountModalProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle login logic here
-    console.log("Login with:", { email, password })
+    // Handle account creation logic here
+    console.log("Create account with:", { email, password, confirmPassword })
     onClose()
   }
 
-  const handleGoogleLogin = () => {
-    // Handle Google login logic here
-    console.log("Login with Google")
+  const handleGoogleSignup = () => {
+    // Handle Google sign up logic here
+    console.log("Sign up with Google")
     onClose()
   }
 
@@ -43,8 +44,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }:
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Welcome back</DialogTitle>
-          <DialogDescription>Sign in to your Melodate account to continue your musical journey</DialogDescription>
+          <DialogTitle className="text-2xl">Create an Account</DialogTitle>
+          <DialogDescription>Join Melodate to discover and share your favorite music</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -60,12 +61,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }:
             />
           </div>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Button variant="link" className="h-auto p-0 text-xs">
-                Forgot password?
-              </Button>
-            </div>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
@@ -74,9 +70,19 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }:
               required
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
 
           <Button type="submit" className="w-full">
-            Sign In
+            Create Account
           </Button>
 
           <div className="relative my-4">
@@ -84,11 +90,11 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }:
               <Separator className="w-full" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-background px-2 text-xs text-muted-foreground">OR CONTINUE WITH</span>
+              <span className="bg-background px-2 text-xs text-muted-foreground">OR SIGN UP WITH</span>
             </div>
           </div>
 
-          <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin}>
+          <Button type="button" variant="outline" className="w-full" onClick={handleGoogleSignup}>
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -108,15 +114,15 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }:
               />
               <path d="M1 1h22v22H1z" fill="none" />
             </svg>
-            Sign in with Google
+            Sign up with Google
           </Button>
         </form>
 
         <DialogFooter className="flex flex-col sm:flex-row sm:justify-center sm:space-x-0">
           <div className="text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Button variant="link" className="h-auto p-0" onClick={onSwitchToCreateAccount}>
-              Create an account
+            Already have an account?{" "}
+            <Button variant="link" className="h-auto p-0" onClick={onSwitchToLogin}>
+              Sign in
             </Button>
           </div>
         </DialogFooter>
