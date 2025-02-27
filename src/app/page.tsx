@@ -10,6 +10,7 @@ import SearchBar from "@/components/search-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicGrid from "@/components/music-grid";
 import LoginModal from "@/components/login-modal";
+import CreateAccountModal from "@/components/create-account-modal";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -44,6 +45,17 @@ export default function Home() {
   const handleSearch = () => refetch();
 
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false)
+
+  const handleSwitchToCreateAccount = () => {
+    setLoginModalOpen(false)
+    setCreateAccountModalOpen(true)
+  }
+
+  const handleSwitchToLogin = () => {
+    setCreateAccountModalOpen(false)
+    setLoginModalOpen(true)
+  }
 
   return (
     // <div className="container mx-auto p-4">
@@ -149,11 +161,20 @@ export default function Home() {
         </Tabs>
       </div>
     </main>
-    <LoginModal isOpen={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+    <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSwitchToCreateAccount={handleSwitchToCreateAccount}
+      />
+      <CreateAccountModal
+        isOpen={createAccountModalOpen}
+        onClose={() => setCreateAccountModalOpen(false)}
+        onSwitchToLogin={handleSwitchToLogin}
+      />
     <footer className="border-t bg-muted/40">
       <div className="container py-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2024 Melodate. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Melodate. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
               Privacy Policy
