@@ -20,36 +20,68 @@ const getSpotifyToken = async () => {
   return data.access_token;
 };
 
+const fetchPaginatedResults = async (
+  token: string,
+  query: string,
+  type: "album" | "track",
+  limit: number,
+  maxItems: number
+) => {
+  const results: any[] = [];
+  let offset = 0;
+  const maxPerPage = Math.min(limit, 50);
+
+  while (results.length < maxItems) {
+    const response = await axios.get("https://api.spotify.com/v1/search", {
+      params: { q: query, type, limit: maxPerPage, offset },
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const items = type === "album" ? response.data.albums.items : response.data.tracks.items;
+    results.push(...items.map((item: any) => ({ ...item, type })));
+
+    const total = type === "album" ? response.data.albums.total : response.data.tracks.total;
+    offset += maxPerPage;
+
+    if (offset >= total || results.length >= maxItems) break;
+  }
+
+  return results;
+};
+
 export async function POST(req: NextRequest) {
-  const { date, genre, artist, label } = await req.json();
-  if (!date) return NextResponse.json({ error: "Date is required" }, { status: 400 });
+  const { dateRange, genre, artist } = await req.json();
+
+  // Remove the strict dateRange requirement
+  if (!dateRange && !genre && !artist) {
+    return NextResponse.json({ error: "At least one filter (date, genre, or artist) is required" }, { status: 400 });
+  }
 
   const token = await getSpotifyToken();
-  let query = `year:${date.split("-")[0]}`; // Spotify uses year for albums
+  let query = "";
+  if (dateRange?.from) query += ` year:${dateRange.from.split("-")[0]}`;
+  if (dateRange?.to) query += `-${dateRange.to.split("-")[0]}`;
   if (genre) query += ` genre:${genre}`;
   if (artist) query += ` artist:${artist}`;
-  if (label) query += ` label:${label}`;
 
   const cacheKey = `search:${query}`;
   const cached = await redis.get(cacheKey);
   if (cached) return NextResponse.json(JSON.parse(cached));
 
-  const [albumsRes, tracksRes] = await Promise.all([
-    axios.get("https://api.spotify.com/v1/search", {
-      params: { q: query, type: "album", limit: 50 },
-      headers: { Authorization: `Bearer ${token}` },
-    }),
-    axios.get("https://api.spotify.com/v1/search", {
-      params: { q: query, type: "track", limit: 50 },
-      headers: { Authorization: `Bearer ${token}` },
-    }),
+  const maxItems = 200;
+  const limitPerRequest = 50;
+
+  const [albums, tracks] = await Promise.all([
+    fetchPaginatedResults(token, query.trim(), "album", limitPerRequest, maxItems),
+    fetchPaginatedResults(token, query.trim(), "track", limitPerRequest, maxItems),
   ]);
 
-  const releases = [
-    ...albumsRes.data.albums.items.map((item: any) => ({ ...item, type: "album" })),
-    ...tracksRes.data.tracks.items.map((item: any) => ({ ...item, type: "track" })),
-  ].sort((a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime());
+  const releases = [...albums, ...tracks].sort(
+    (a, b) => new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
+  );
 
-  await redis.setex(cacheKey, 3600, JSON.stringify({ releases }));
-  return NextResponse.json({ releases });
+  const cappedReleases = releases.slice(0, maxItems);
+
+  await redis.setex(cacheKey, 3600, JSON.stringify({ releases: cappedReleases }));
+  return NextResponse.json({ releases: cappedReleases });
 }

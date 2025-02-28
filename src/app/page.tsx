@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicGrid from "@/components/music-grid";
 import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
+import { useSearchParams } from "next/navigation";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -30,17 +31,17 @@ const fetchReleases = async (filters: {
 
 export default function Home() {
   const [filters, setFilters] = useState({
-    date: "",
+    dateRange: "",
     genre: "",
     artist: "",
     label: "",
   });
 
-  const { data, isLoading, refetch } = useQuery({
-    queryKey: ["releases", filters],
-    queryFn: () => fetchReleases(filters),
-    enabled: false, // Trigger manually
-  });
+  // const { data, isLoading, refetch } = useQuery({
+  //   queryKey: ["releases", filters],
+  //   queryFn: () => fetchReleases(filters),
+  //   enabled: false, // Trigger manually
+  // });
 
   const handleSearch = () => refetch();
 
@@ -56,6 +57,36 @@ export default function Home() {
     setCreateAccountModalOpen(false)
     setLoginModalOpen(true)
   }
+
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
+  const type = searchParams.get("type") || "genre"; // Default to genre
+  const from = searchParams.get("from") || undefined;
+  const to = searchParams.get("to") || undefined;
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["releases", { query, type, from, to }],
+    queryFn: () =>
+      fetchReleases({
+        date: `${from} - ${to}`,
+        [type]: query || undefined,
+      }),
+    enabled: !!query || !!from || !!to, // Only fetch if there's a query or date range
+  });
+  console.log("Refetch function:", typeof refetch);
+  // Map Spotify API results to SearchResultItem props
+  console.log(data)
+  const results = data?.releases?.map((item: any, index: number) => ({
+    id: index, // Use index as a temporary ID since Spotify IDs might not be unique across types
+    title: item.name,
+    artist: item.artists.map((a: any) => a.name).join(", "),
+    album: item.type === "album" ? item.name : item.album.name,
+    year: item.release_date ? item.release_date.split("-")[0] : (item.album.release_date ?  item.album.release_date.split("-")[0] : 'Unknown' ), // Extract year from release_date
+    coverArt: item.album?.images[0]?.url || item.images?.[0]?.url || "/assets/placeholder.svg",
+    genre: item.type === "track" && item.album.genres?.[0] ? item.album.genres[0] : "Unknown", // Genre is often unavailable
+    type: item.album_type ? (item.album_type === 'single' ? 'Track' : 'Album') : ( item.type ? ( item.type === 'album' ? 'Album' : 'Track'): 'Unknown'),
+    url: item.external_urls.spotify
+  })) || [];
 
   return (
     // <div className="container mx-auto p-4">
@@ -137,7 +168,7 @@ export default function Home() {
           </p>
         </div>
 
-        <SearchBar />
+        <SearchBar refetch={refetch}/>
 
         <Tabs defaultValue="trending">
           <TabsList className="grid w-full grid-cols-4">

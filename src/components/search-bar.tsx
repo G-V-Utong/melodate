@@ -19,35 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
 
-const fetchReleases = async (filters: {
-  date: string;
-  genre?: string;
-  artist?: string;
-  label?: string;
-}) => {
-  const res = await fetch("/api/spotify/search", {
-    method: "POST",
-    body: JSON.stringify(filters),
-    headers: { "Content-Type": "application/json" },
-  });
-  return res.json();
-};
+// Add refetch as a prop
+interface SearchBarProps {
+  refetch: () => void;
+}
 
-export default function SearchBar() {
+export default function SearchBar({ refetch }: SearchBarProps) {
   const [query, setQuery] = useState("");
-  const [searchType, setSearchType] = useState("genre");
+  const [searchType, setSearchType] = useState<"genre" | "artist">("genre");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
-
-  const { isLoading, refetch } = useQuery({
-    queryKey: ["releases", { date: dateRange }],
-    queryFn: () => fetchReleases({ date: JSON.stringify(dateRange) }),
-    enabled: false,
-  });
 
   const months = [
     "January",
@@ -78,18 +62,45 @@ export default function SearchBar() {
   const handleToYearChange = (year: string) =>
     setToDate(setYear(toDate, parseInt(year)));
 
-  // Clear the selected date range
   const clearDateRange = () => {
     setDateRange(undefined);
     setFromDate(new Date());
     setToDate(new Date());
   };
 
+  const handleSearch = () => {
+    if (!query && !dateRange) {
+      console.log("Please provide a search query or date range.");
+      return;
+    }
+    // Update URL with search params
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (searchType) params.set("type", searchType);
+    if (dateRange?.from) params.set("from", format(dateRange.from, "yyyy-MM-dd"));
+    if (dateRange?.to) params.set("to", format(dateRange.to, "yyyy-MM-dd"));
+    window.history.pushState({}, "", `?${params.toString()}`);
+    if (typeof refetch === "function") {
+      refetch();
+    } else {
+      console.error("Refetch function is not available:", refetch);
+    }
+  };
+
   return (
-    <form className="space-y-4 p-6 backdrop-blur-xl bg-white/20 rounded-2xl">
+    <form
+      className="space-y-4 p-6 backdrop-blur-xl bg-white/20 rounded-2xl"
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSearch();
+      }}
+    >
       <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 items-center">
         <div className="flex-grow flex space-x-2">
-          <Select value={searchType} onValueChange={setSearchType}>
+          <Select 
+            value={searchType} 
+            onValueChange={(value) => setSearchType(value as "genre" | "artist")}
+          >
             <SelectTrigger className="w-[120px] bg-white/80 border-0">
               <SelectValue placeholder="Search by" />
             </SelectTrigger>
@@ -107,7 +118,6 @@ export default function SearchBar() {
           />
         </div>
 
-        {/* Date Range Picker */}
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -116,21 +126,19 @@ export default function SearchBar() {
             >
               <div className="flex items-center">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange?.from
-                  ? dateRange.to
-                    ? `${format(dateRange.from, "LLL dd, y")} - ${format(
-                        dateRange.to,
-                        "LLL dd, y"
-                      )}`
-                    : format(dateRange.from, "LLL dd, y")
-                  : "Pick a date range"}
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    `${format(dateRange.from, "LLL dd, y")} - ${format(
+                      dateRange.to,
+                      "LLL dd, y"
+                    )}`
+                  ) : (
+                    format(dateRange.from, "LLL dd, y")
+                  )
+                ) : (
+                  "Pick a date range"
+                )}
               </div>
-              {/* {dateRange && (
-                <X
-                  className="ml-2 h-4 w-4 text-gray-500 hover:text-red-500 cursor-pointer z-10"
-                  onClick={clearDateRange}
-                />
-              )} */}
             </Button>
           </PopoverTrigger>
           {dateRange && (
@@ -138,7 +146,7 @@ export default function SearchBar() {
               type="button"
               className="mr-2 h-4 w-4 text-gray-500 hover:text-red-500 cursor-pointer"
               onClick={(e) => {
-                e.stopPropagation(); // Prevent popover from opening
+                e.stopPropagation();
                 clearDateRange();
               }}
             >
@@ -147,7 +155,6 @@ export default function SearchBar() {
           )}
           <PopoverContent className="w-auto p-0" align="start">
             <div className="flex justify-between p-2 space-x-4">
-              {/* Month and Year Pickers for "From" Date */}
               <Select
                 value={months[getMonth(fromDate)]}
                 onValueChange={handleFromMonthChange}
@@ -189,7 +196,6 @@ export default function SearchBar() {
             />
 
             <div className="flex justify-between p-2 space-x-4">
-              {/* Month and Year Pickers for "To" Date */}
               <Select
                 value={months[getMonth(toDate)]}
                 onValueChange={handleToMonthChange}
@@ -232,14 +238,9 @@ export default function SearchBar() {
           </PopoverContent>
         </Popover>
 
-        <Button
-          type="button"
-          className="bg-primary hover:bg-primary/90"
-          disabled={isLoading}
-          onClick={refetch}
-        >
-          <Search className="mr-2 h-4 w-4" />{" "}
-          {isLoading ? "Searching..." : "Search"}
+        <Button type="submit" className="bg-primary hover:bg-primary/90">
+          <Search className="mr-2 h-4 w-4" />
+          Search
         </Button>
       </div>
     </form>
