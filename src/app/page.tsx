@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,14 @@ import MusicGrid from "@/components/music-grid";
 import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
 import { useSearchParams } from "next/navigation";
-import { fetchTrending, fetchNewReleases, fetchTopRated, fetchRecommended } from "@/app/api/spotify/spotify";
+import {
+  fetchTrending,
+  fetchNewReleases,
+  fetchTopRated,
+  fetchRecommended,
+} from "@/app/api/spotify/spotify";
+import AuthButton from "@/components/auth-button";
+import Link from "next/link";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -30,7 +37,6 @@ const fetchReleases = async (filters: {
 };
 
 export default function Home() {
-
   const [filters, setFilters] = useState({
     dateRange: "",
     genre: "",
@@ -46,18 +52,23 @@ export default function Home() {
 
   const handleSearch = () => refetch();
 
-  const [loginModalOpen, setLoginModalOpen] = useState(false)
-  const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
+  const [user, setUser] = useState(() => {
+    // Retrieve user data from localStorage on initial render
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const handleSwitchToCreateAccount = () => {
-    setLoginModalOpen(false)
-    setCreateAccountModalOpen(true)
-  }
+    setLoginModalOpen(false);
+    setCreateAccountModalOpen(true);
+  };
 
   const handleSwitchToLogin = () => {
-    setCreateAccountModalOpen(false)
-    setLoginModalOpen(true)
-  }
+    setCreateAccountModalOpen(false);
+    setLoginModalOpen(true);
+  };
 
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
@@ -74,19 +85,38 @@ export default function Home() {
       }),
     enabled: !!query || !!from || !!to, // Only fetch if there's a query or date range
   });
-  
+
   // Map Spotify API results to SearchResultItem props
-  const results = data?.releases?.map((item: any, index: number) => ({
-    id: index, // Use index as a temporary ID since Spotify IDs might not be unique across types
-    title: item.name,
-    artist: item.artists.map((a: any) => a.name).join(", "),
-    album: item.type === "album" ? item.name : item.album.name,
-    year: item.release_date ? item.release_date.split("-")[0] : (item.album.release_date ?  item.album.release_date.split("-")[0] : 'Unknown' ), // Extract year from release_date
-    coverArt: item.album?.images[0]?.url || item.images?.[0]?.url || "/assets/placeholder.svg",
-    genre: item.type === "track" && item.album.genres?.[0] ? item.album.genres[0] : "Unknown", // Genre is often unavailable
-    type: item.album_type ? (item.album_type === 'single' ? 'Track' : 'Album') : ( item.type ? ( item.type === 'album' ? 'Album' : 'Track'): 'Unknown'),
-    url: item.external_urls.spotify
-  })) || [];
+  const results =
+    data?.releases?.map((item: any, index: number) => ({
+      id: index, // Use index as a temporary ID since Spotify IDs might not be unique across types
+      title: item.name,
+      artist: item.artists.map((a: any) => a.name).join(", "),
+      album: item.type === "album" ? item.name : item.album.name,
+      year: item.release_date
+        ? item.release_date.split("-")[0]
+        : item.album.release_date
+        ? item.album.release_date.split("-")[0]
+        : "Unknown", // Extract year from release_date
+      coverArt:
+        item.album?.images[0]?.url ||
+        item.images?.[0]?.url ||
+        "/assets/placeholder.svg",
+      genre:
+        item.type === "track" && item.album.genres?.[0]
+          ? item.album.genres[0]
+          : "Unknown", // Genre is often unavailable
+      type: item.album_type
+        ? item.album_type === "single"
+          ? "Track"
+          : "Album"
+        : item.type
+        ? item.type === "album"
+          ? "Album"
+          : "Track"
+        : "Unknown",
+      url: item.external_urls.spotify,
+    })) || [];
 
   const { data: trending, isLoading: trendingLoading } = useQuery({
     queryKey: ["trending"],
@@ -105,109 +135,83 @@ export default function Home() {
     queryFn: fetchRecommended,
   });
 
+  const handleLoginSuccess = (userData: any) => {
+    setUser(userData); // Set user data on successful login
+    localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
+  };
+
+  const handleLogout = () => {
+    setUser(null); // Clear user state
+    localStorage.removeItem("user"); // Remove user data from localStorage
+  };
+
   return (
-    // <div className="container mx-auto p-4">
-    //   <h1 className="text-2xl font-bold mb-4">Music Release Discovery</h1>
-      
-    //   {/* Search Form */}
-    //   <div className="grid gap-4 mb-6 md:grid-cols-4">
-    //     <Input
-    //       type="date"
-    //       value={filters.date}
-    //       onChange={(e) => setFilters({ ...filters, date: e.target.value })}
-    //       placeholder="Release Date"
-    //     />
-    //     <Input
-    //       value={filters.genre}
-    //       onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
-    //       placeholder="Genre"
-    //     />
-    //     <Input
-    //       value={filters.artist}
-    //       onChange={(e) => setFilters({ ...filters, artist: e.target.value })}
-    //       placeholder="Artist"
-    //     />
-    //     <Input
-    //       value={filters.label}
-    //       onChange={(e) => setFilters({ ...filters, label: e.target.value })}
-    //       placeholder="Label"
-    //     />
-    //   </div>
-    //   <Button onClick={handleSearch} disabled={isLoading}>
-    //     {isLoading ? "Searching..." : "Search"}
-    //   </Button>
-
-    //   {/* Results */}
-    //   <div className="grid gap-4 mt-6 md:grid-cols-3">
-    //     {data?.releases?.map((item: any) => (
-    //       <MusicCard key={item.id} item={item} />
-    //     ))}
-    //   </div>
-    // </div>
     <div className="min-h-screen bg-background">
-    <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Search className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
+      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <Link href={"/"} className="cursor-pointer flex items-center gap-2">
+            <Search className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
+          </Link>
+          <nav className="hidden md:flex items-center gap-6">
+            <a href="#" className="text-sm font-medium hover:text-primary">
+              Discover
+            </a>
+            <a href="#" className="text-sm font-medium hover:text-primary">
+              New Releases
+            </a>
+            <a href="#" className="text-sm font-medium hover:text-primary">
+              Top Charts
+            </a>
+            <a href="#" className="text-sm font-medium hover:text-primary">
+              Playlists
+            </a>
+          </nav>
+          <div className="flex items-center">
+            <AuthButton
+              onLoginClick={() => setLoginModalOpen(true)}
+              user={user}
+              handleLogout={handleLogout}
+            />
+          </div>
         </div>
-        <nav className="hidden md:flex items-center gap-6">
-          <a href="#" className="text-sm font-medium hover:text-primary">
-            Discover
-          </a>
-          <a href="#" className="text-sm font-medium hover:text-primary">
-            New Releases
-          </a>
-          <a href="#" className="text-sm font-medium hover:text-primary">
-            Top Charts
-          </a>
-          <a href="#" className="text-sm font-medium hover:text-primary">
-            Playlists
-          </a>
-        </nav>
-        <div className="flex items-center">
-            <button
-              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Login
-          </button>
-        </div>
-      </div>
-    </header>
+      </header>
 
-    <main className="container py-8">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <div className="space-y-2 text-center">
-          <h2 className="text-3xl font-bold tracking-tight">Find Your Perfect Music</h2>
-          <p className="text-muted-foreground">
-            Search by artist, label, genre, or release date to discover your next favorite track
-          </p>
-        </div>
+      <main className="container py-8">
+        <div className="mx-auto max-w-5xl space-y-8">
+          <div className="space-y-2 text-center">
+            <h2 className="text-3xl font-bold tracking-tight">
+              Find Your Perfect Music
+            </h2>
+            <p className="text-muted-foreground">
+              Search by artist, label, genre, or release date to discover your
+              next favorite track
+            </p>
+          </div>
 
-        <SearchBar refetch={refetch}/>
+          <SearchBar refetch={refetch} />
 
-        {/* <Tabs defaultValue="trending">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="trending">Trending</TabsTrigger>
-            <TabsTrigger value="new-releases">New Releases</TabsTrigger>
-            <TabsTrigger value="top-rated">Top Rated</TabsTrigger>
-            <TabsTrigger value="recommended">Recommended</TabsTrigger>
-          </TabsList>
-          <TabsContent value="trending" className="mt-6">
-            <MusicGrid category="Trending" />
-          </TabsContent>
-          <TabsContent value="new-releases" className="mt-6">
-            <MusicGrid category="New Releases" />
-          </TabsContent>
-          <TabsContent value="top-rated" className="mt-6">
-            <MusicGrid category="Top Rated" />
-          </TabsContent>
-          <TabsContent value="recommended" className="mt-6">
-            <MusicGrid category="Recommended" />
-          </TabsContent>
-        </Tabs> */}
-        <Tabs defaultValue="trending">
+          {/* <Tabs defaultValue="trending">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="trending">Trending</TabsTrigger>
+              <TabsTrigger value="new-releases">New Releases</TabsTrigger>
+              <TabsTrigger value="top-rated">Top Rated</TabsTrigger>
+              <TabsTrigger value="recommended">Recommended</TabsTrigger>
+            </TabsList>
+            <TabsContent value="trending" className="mt-6">
+              <MusicGrid category="Trending" />
+            </TabsContent>
+            <TabsContent value="new-releases" className="mt-6">
+              <MusicGrid category="New Releases" />
+            </TabsContent>
+            <TabsContent value="top-rated" className="mt-6">
+              <MusicGrid category="Top Rated" />
+            </TabsContent>
+            <TabsContent value="recommended" className="mt-6">
+              <MusicGrid category="Recommended" />
+            </TabsContent>
+          </Tabs> */}
+          <Tabs defaultValue="trending">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="trending">Trending</TabsTrigger>
               <TabsTrigger value="new-releases">New Releases</TabsTrigger>
@@ -216,51 +220,79 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value="trending" className="mt-6">
-              <MusicGrid category="Trending" data={trending?.tracks?.items.map((item) => item.track)} isLoading={trendingLoading} />
+              <MusicGrid
+                category="Trending"
+                data={trending?.tracks?.items.map((item) => item.track)}
+                isLoading={trendingLoading}
+              />
             </TabsContent>
 
             <TabsContent value="new-releases" className="mt-6">
-              <MusicGrid category="New Releases" data={newReleases?.albums?.items} isLoading={newReleasesLoading} />
+              <MusicGrid
+                category="New Releases"
+                data={newReleases?.albums?.items}
+                isLoading={newReleasesLoading}
+              />
             </TabsContent>
 
             <TabsContent value="top-rated" className="mt-6">
-              <MusicGrid category="Top Rated" data={topRated?.tracks?.items.map((item) => item.track)} isLoading={topRatedLoading} />
+              <MusicGrid
+                category="Top Rated"
+                data={topRated?.tracks?.items.map((item) => item.track)}
+                isLoading={topRatedLoading}
+              />
             </TabsContent>
 
             <TabsContent value="recommended" className="mt-6">
-              <MusicGrid category="Recommended" data={recommended?.tracks?.items.map((item) => item.track)} isLoading={recommendedLoading} />
+              <MusicGrid
+                category="Recommended"
+                data={recommended?.tracks?.items.map((item) => item.track)}
+                isLoading={recommendedLoading}
+              />
             </TabsContent>
           </Tabs>
-      </div>
-    </main>
-    <LoginModal
+        </div>
+      </main>
+      <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToCreateAccount={handleSwitchToCreateAccount}
+        onLoginSuccess={handleLoginSuccess}
       />
       <CreateAccountModal
         isOpen={createAccountModalOpen}
         onClose={() => setCreateAccountModalOpen(false)}
         onSwitchToLogin={handleSwitchToLogin}
       />
-    <footer className="border-t bg-muted/40">
-      <div className="container py-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Melodate. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Terms of Service
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Contact Us
-            </a>
+      <footer className="border-t bg-muted/40">
+        <div className="container py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Melodate. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Contact Us
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
-  </div>
+      </footer>
+    </div>
   );
 }

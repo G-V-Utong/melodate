@@ -11,6 +11,7 @@ import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
 import { useState } from "react";
 import AlbumResultItem from "@/components/albumResults";
+import AuthButton from "@/components/auth-button";
 
 const fetchReleases = async (filters: {
   dateRange?: { from?: string; to?: string };
@@ -34,6 +35,10 @@ export default function SearchResults() {
   const to = searchParams.get("to") || undefined;
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const handleSwitchToCreateAccount = () => {
     setLoginModalOpen(false);
@@ -43,6 +48,10 @@ export default function SearchResults() {
   const handleSwitchToLogin = () => {
     setCreateAccountModalOpen(false);
     setLoginModalOpen(true);
+  };
+
+  const handleLoginSuccess = (userData: any) => {
+    setUser(userData); // Set user data on successful login
   };
 
   const { data, isLoading, refetch } = useQuery({
@@ -86,8 +95,7 @@ export default function SearchResults() {
             item.images?.[0]?.url ||
             item.album?.images?.[0]?.url ||
             "/assets/placeholder.svg",
-          url:
-            item.album?.external_urls?.spotify,
+          url: item.album?.external_urls?.spotify,
         });
       }
     });
@@ -127,11 +135,9 @@ export default function SearchResults() {
     <div className="min-h-screen bg-background">
       <header className="z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <Link href={"/"}>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <Search className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
-            </div>
+          <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
+            <Search className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#" className="text-sm font-medium hover:text-primary">
@@ -148,12 +154,10 @@ export default function SearchResults() {
             </a>
           </nav>
           <div className="flex items-center">
-            <button
-              className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              onClick={() => setLoginModalOpen(true)}
-            >
-              Login
-            </button>
+            <AuthButton
+              onLoginClick={() => setLoginModalOpen(true)}
+              user={user}
+            />
           </div>
         </div>
       </header>
@@ -233,6 +237,7 @@ export default function SearchResults() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToCreateAccount={handleSwitchToCreateAccount}
+        onLoginSuccess={handleLoginSuccess}
       />
       <CreateAccountModal
         isOpen={createAccountModalOpen}
