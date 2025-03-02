@@ -12,10 +12,13 @@ import { AiOutlineSpotify } from "react-icons/ai";
 
 interface MusicGridProps {
   category: string;
+  data: any;
+  isLoading: boolean
 }
 
-export default function MusicGrid({ category }: MusicGridProps) {
+export default function MusicGrid({ category, data, isLoading }: MusicGridProps) {
   // Mock data - in a real app, this would come from an API
+  // console.log(data)
   const musicItems = [
     {
       id: 1,

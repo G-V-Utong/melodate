@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { format, getMonth, getYear, setMonth, setYear } from "date-fns";
 import { Search, Calendar as CalendarIcon, X } from "lucide-react";
 import {
@@ -29,7 +30,8 @@ export default function SearchBar({ refetch }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState<"genre" | "artist">("genre");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
+  const router = useRouter();
+  const pathname = usePathname()
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
 
@@ -70,7 +72,6 @@ export default function SearchBar({ refetch }: SearchBarProps) {
 
   const handleSearch = () => {
     if (!query && !dateRange) {
-      console.log("Please provide a search query or date range.");
       return;
     }
     // Update URL with search params
@@ -79,7 +80,11 @@ export default function SearchBar({ refetch }: SearchBarProps) {
     if (searchType) params.set("type", searchType);
     if (dateRange?.from) params.set("from", format(dateRange.from, "yyyy-MM-dd"));
     if (dateRange?.to) params.set("to", format(dateRange.to, "yyyy-MM-dd"));
-    window.history.pushState({}, "", `?${params.toString()}`);
+    
+    const newPath = pathname.includes("/search") ? pathname : "/search";
+
+    router.push(`${newPath}?${params.toString()}`);
+
     if (typeof refetch === "function") {
       refetch();
     } else {

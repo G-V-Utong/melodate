@@ -12,6 +12,7 @@ import MusicGrid from "@/components/music-grid";
 import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
 import { useSearchParams } from "next/navigation";
+import { fetchTrending, fetchNewReleases, fetchTopRated, fetchRecommended } from "@/app/api/spotify/spotify";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -30,6 +31,7 @@ const fetchReleases = async (filters: {
 };
 
 export default function Home() {
+
   const [filters, setFilters] = useState({
     dateRange: "",
     genre: "",
@@ -87,6 +89,23 @@ export default function Home() {
     type: item.album_type ? (item.album_type === 'single' ? 'Track' : 'Album') : ( item.type ? ( item.type === 'album' ? 'Album' : 'Track'): 'Unknown'),
     url: item.external_urls.spotify
   })) || [];
+
+  const { data: trending, isLoading: trendingLoading } = useQuery({
+    queryKey: ["trending"],
+    queryFn: fetchTrending,
+  });
+  const { data: newReleases, isLoading: newReleasesLoading } = useQuery({
+    queryKey: ["new-releases"],
+    queryFn: fetchNewReleases,
+  });
+  const { data: topRated, isLoading: topRatedLoading } = useQuery({
+    queryKey: ["top-rated"],
+    queryFn: fetchTopRated,
+  });
+  const { data: recommended, isLoading: recommendedLoading } = useQuery({
+    queryKey: ["recommended"],
+    queryFn: fetchRecommended,
+  });
 
   return (
     // <div className="container mx-auto p-4">
@@ -170,7 +189,7 @@ export default function Home() {
 
         <SearchBar refetch={refetch}/>
 
-        <Tabs defaultValue="trending">
+        {/* <Tabs defaultValue="trending">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="trending">Trending</TabsTrigger>
             <TabsTrigger value="new-releases">New Releases</TabsTrigger>
@@ -189,7 +208,31 @@ export default function Home() {
           <TabsContent value="recommended" className="mt-6">
             <MusicGrid category="Recommended" />
           </TabsContent>
-        </Tabs>
+        </Tabs> */}
+        <Tabs defaultValue="trending">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="trending">Trending</TabsTrigger>
+              <TabsTrigger value="new-releases">New Releases</TabsTrigger>
+              <TabsTrigger value="top-rated">Top Rated</TabsTrigger>
+              <TabsTrigger value="recommended">Recommended</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="trending" className="mt-6">
+              <MusicGrid category="Trending" data={trending?.tracks?.items} isLoading={trendingLoading} />
+            </TabsContent>
+
+            <TabsContent value="new-releases" className="mt-6">
+              <MusicGrid category="New Releases" data={newReleases?.albums?.items} isLoading={newReleasesLoading} />
+            </TabsContent>
+
+            <TabsContent value="top-rated" className="mt-6">
+              <MusicGrid category="Top Rated" data={topRated?.playlists?.items} isLoading={topRatedLoading} />
+            </TabsContent>
+
+            <TabsContent value="recommended" className="mt-6">
+              <MusicGrid category="Recommended" data={recommended?.tracks} isLoading={recommendedLoading} />
+            </TabsContent>
+          </Tabs>
       </div>
     </main>
     <LoginModal
