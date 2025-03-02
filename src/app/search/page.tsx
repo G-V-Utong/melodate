@@ -54,25 +54,8 @@ export default function SearchResults() {
       }),
     enabled: !!query || !!from || !!to, // Only fetch if there's a query or date range
   });
-  // console.log("Refetch function:", typeof refetch);
   // Map Spotify API results to SearchResultItem props
-  console.log(data);
   const results = data?.releases || [];
-
-  // const albumInfo = results?.filter((item: any) => item.album?.album_type === 'album' || item.album_type === 'album')
-  // ?.map((item: any, index: number) => ({
-  //   id: index,
-  //   title: item.album?.name,
-  //   artist: (item.artists || item.album?.artists || []).map((a: any) => a.name).join(", "),
-  //   year: item.release_date
-  //     ? item.release_date.split("-")[0]
-  //     : item.album?.release_date
-  //       ? item.album.release_date.split("-")[0]
-  //       : 'Unknown',
-  //   type: 'Album',
-  //   coverArt: item.images?.[0]?.url || item.album?.images?.[0]?.url || "/assets/placeholder.svg",
-  //   url: item.external_urls?.spotify || item.album?.external_urls?.spotify
-  // })) || [];
 
   const uniqueAlbumInfo = [];
   const uniqueIds = new Set(); // Use a Set to track unique IDs
@@ -104,12 +87,10 @@ export default function SearchResults() {
             item.album?.images?.[0]?.url ||
             "/assets/placeholder.svg",
           url:
-            item.external_urls?.spotify || item.album?.external_urls?.spotify,
+            item.album?.external_urls?.spotify,
         });
       }
     });
-
-  console.log(uniqueAlbumInfo); // Log the final array with unique items
 
   const trackInfo =
     results?.map((item: any, index: number) => ({
@@ -141,8 +122,6 @@ export default function SearchResults() {
         : "Unknown",
       url: item.external_urls.spotify,
     })) || [];
-
-  console.log(albumInfo);
 
   return (
     <div className="min-h-screen bg-background">
