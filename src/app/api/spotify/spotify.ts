@@ -43,13 +43,13 @@ const fetchSpotifyData = async (endpoint: string) => {
 };
 
 // Fetch Trending (Currently Top 50 Global)
-export const fetchTrending = () => fetchSpotifyData("/playlists/3cEYpjA9oz9GiPac4AsH4n");
+export const fetchTrending = () => fetchSpotifyData("/playlists/57EG9lWmdn7HHofXuQVsow");
 
 // Fetch New Releases
 export const fetchNewReleases = () => fetchSpotifyData("/browse/new-releases");
 
 // Fetch Top Rated (Based on popular albums)
-export const fetchTopRated = () => fetchSpotifyData("/browse/featured-playlists");
+export const fetchTopRated = () => fetchSpotifyData("/playlists/5ABHKGoOzxkaa28ttQV9sE");
 
 // Fetch Recommended (Based on genre or category)
-export const fetchRecommended = () => fetchSpotifyData("/recommendations?seed_genres=pop,hip-hop,rock");
+export const fetchRecommended = () => fetchSpotifyData("/playlists/26PbhSJhJmhexyk33DVQNk");

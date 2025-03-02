@@ -13,86 +13,15 @@ import { AiOutlineSpotify } from "react-icons/ai";
 interface MusicGridProps {
   category: string;
   data: any;
-  isLoading: boolean
+  isLoading: boolean;
 }
 
-export default function MusicGrid({ category, data, isLoading }: MusicGridProps) {
-  // Mock data - in a real app, this would come from an API
-  // console.log(data)
-  const musicItems = [
-    {
-      id: 1,
-      title: "Midnight Memories",
-      artist: "The Weeknd",
-      genre: "R&B",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2023",
-      label: "Universal",
-    },
-    {
-      id: 2,
-      title: "Electric Dreams",
-      artist: "Daft Punk",
-      genre: "Electronic",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2021",
-      label: "Columbia",
-    },
-    {
-      id: 3,
-      title: "Golden Hour",
-      artist: "Kacey Musgraves",
-      genre: "Country Pop",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2018",
-      label: "Universal",
-    },
-    {
-      id: 4,
-      title: "Future Nostalgia",
-      artist: "Dua Lipa",
-      genre: "Pop",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2020",
-      label: "Warner",
-    },
-    {
-      id: 5,
-      title: "To Pimp a Butterfly",
-      artist: "Kendrick Lamar",
-      genre: "Hip Hop",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2015",
-      label: "Def Jam",
-    },
-    {
-      id: 6,
-      title: "Blue Banisters",
-      artist: "Lana Del Rey",
-      genre: "Alternative",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2021",
-      label: "Sony Music",
-    },
-    {
-      id: 7,
-      title: "Currents",
-      artist: "Tame Impala",
-      genre: "Psychedelic Rock",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2015",
-      label: "Universal",
-    },
-    {
-      id: 8,
-      title: "Blonde",
-      artist: "Frank Ocean",
-      genre: "R&B",
-      coverArt: "/assets/placeholder.svg?height=300&width=300",
-      releaseDate: "2016",
-      label: "Def Jam",
-    },
-  ];
+export default function MusicGrid({
+  category,
+  data,
+  isLoading,
+}: MusicGridProps) {
+  // console.log(data);
 
   return (
     <div className="space-y-4">
@@ -104,13 +33,13 @@ export default function MusicGrid({ category, data, isLoading }: MusicGridProps)
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {musicItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden group">
+        {data?.map((item: any, index: number) => (
+          <Card key={`${item.id}-${index}`} className="overflow-hidden group">
             <CardHeader className="p-0">
               <div className="relative aspect-square">
                 <Image
-                  src={item.coverArt || "/placeholder.svg"}
-                  alt={`${item.title} by ${item.artist}`}
+                  src={item.images?.[0]?.url || item.album?.images?.[0]?.url || "/assets/placeholder.svg"}
+                  alt={`${item.name} by ${item.artist}`}
                   fill
                   className="object-cover transition-transform group-hover:scale-105"
                 />
@@ -130,19 +59,21 @@ export default function MusicGrid({ category, data, isLoading }: MusicGridProps)
             </CardHeader>
             <CardContent className="p-4">
               <div className="space-y-1">
-                <h4 className="font-medium line-clamp-1">{item.title}</h4>
+                <h4 className="font-medium line-clamp-1">{item.name}</h4>
                 <p className="text-sm text-muted-foreground line-clamp-1">
-                  {item.artist}
+                  {(item.artists || item.album?.artists || [])
+                    .map((a: any) => a.name)
+                    .join(", ")}
                 </p>
               </div>
             </CardContent>
             <CardFooter className="p-4 pt-0 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="text-xs">
-                  {item.genre}
+                  {item.album_type === 'album' ? 'Album' : (item.album_type === 'ep' ? 'EP' : 'Single')}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  {item.releaseDate}
+                  {item?.release_date?.split("-")[0] || item?.album?.release_date?.split("-")[0]}
                 </span>
               </div>
               <div className="flex items-center gap-1">

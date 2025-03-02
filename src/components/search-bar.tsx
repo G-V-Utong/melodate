@@ -51,7 +51,7 @@ export default function SearchBar({ refetch }: SearchBarProps) {
   ];
   const years = Array.from(
     { length: 100 },
-    (_, i) => getYear(new Date()) - 50 + i
+    (_, i) => getYear(new Date()) - 99 + i
   );
 
   const handleFromMonthChange = (month: string) =>

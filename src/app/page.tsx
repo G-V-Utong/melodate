@@ -26,7 +26,6 @@ const fetchReleases = async (filters: {
     headers: { "Content-Type": "application/json" },
   });
   const data = await res.json();
-  console.log("API Response:", data); // ✅ Log the JSON response
   return data;
 };
 
@@ -75,9 +74,8 @@ export default function Home() {
       }),
     enabled: !!query || !!from || !!to, // Only fetch if there's a query or date range
   });
-  console.log("Refetch function:", typeof refetch);
+  
   // Map Spotify API results to SearchResultItem props
-  console.log(data)
   const results = data?.releases?.map((item: any, index: number) => ({
     id: index, // Use index as a temporary ID since Spotify IDs might not be unique across types
     title: item.name,
@@ -218,7 +216,7 @@ export default function Home() {
             </TabsList>
 
             <TabsContent value="trending" className="mt-6">
-              <MusicGrid category="Trending" data={trending?.tracks?.items} isLoading={trendingLoading} />
+              <MusicGrid category="Trending" data={trending?.tracks?.items.map((item) => item.track)} isLoading={trendingLoading} />
             </TabsContent>
 
             <TabsContent value="new-releases" className="mt-6">
@@ -226,11 +224,11 @@ export default function Home() {
             </TabsContent>
 
             <TabsContent value="top-rated" className="mt-6">
-              <MusicGrid category="Top Rated" data={topRated?.playlists?.items} isLoading={topRatedLoading} />
+              <MusicGrid category="Top Rated" data={topRated?.tracks?.items.map((item) => item.track)} isLoading={topRatedLoading} />
             </TabsContent>
 
             <TabsContent value="recommended" className="mt-6">
-              <MusicGrid category="Recommended" data={recommended?.tracks} isLoading={recommendedLoading} />
+              <MusicGrid category="Recommended" data={recommended?.tracks?.items.map((item) => item.track)} isLoading={recommendedLoading} />
             </TabsContent>
           </Tabs>
       </div>
