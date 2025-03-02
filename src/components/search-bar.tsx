@@ -94,71 +94,58 @@ export default function SearchBar({ refetch }: SearchBarProps) {
 
   return (
     <form
-      className="space-y-4 p-6 backdrop-blur-xl bg-white/20 rounded-2xl"
+      className="p-4 md:p-6 backdrop-blur-xl bg-white/20 rounded-2xl"
       onSubmit={(e) => {
         e.preventDefault();
         handleSearch();
       }}
     >
-      <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 items-center">
-        <div className="flex-grow flex space-x-2">
-          <Select 
-            value={searchType} 
-            onValueChange={(value) => setSearchType(value as "genre" | "artist")}
-          >
-            <SelectTrigger className="w-[120px] bg-white/80 border-0">
-              <SelectValue placeholder="Search by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="genre">Genre</SelectItem>
-              <SelectItem value="artist">Artist</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            type="text"
-            placeholder={`Search by ${searchType}...`}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="flex-grow bg-white/80 border-0"
-          />
-        </div>
+      <div className="flex items-center gap-2">
+        <Select 
+          value={searchType} 
+          onValueChange={(value) => setSearchType(value as "genre" | "artist")}
+        >
+          <SelectTrigger className="w-[90px] md:w-[120px] bg-white/80 border-0 h-10">
+            <SelectValue placeholder="Search by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="genre">Genre</SelectItem>
+            <SelectItem value="artist">Artist</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Input
+          type="text"
+          placeholder={`Search by ${searchType}...`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="flex-grow bg-white/80 border-0 h-10 placeholder:text-xs md:placeholder:text-lg"
+        />
 
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full md:w-auto bg-white/80 border-0 flex items-center justify-between"
+              size="icon"
+              className="bg-white/80 border-0 h-10 w-10 p-0 shrink-0"
             >
-              <div className="flex items-center">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    `${format(dateRange.from, "LLL dd, y")} - ${format(
-                      dateRange.to,
-                      "LLL dd, y"
-                    )}`
-                  ) : (
-                    format(dateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  "Pick a date range"
-                )}
-              </div>
+              <CalendarIcon className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           {dateRange && (
             <button
               type="button"
-              className="mr-2 h-4 w-4 text-gray-500 hover:text-red-500 cursor-pointer"
+              className="h-4 w-4 text-gray-500 hover:text-red-500 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 clearDateRange();
               }}
+              aria-label="Clear date range"
             >
               <X className="h-4 w-4" />
             </button>
           )}
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="end">
             <div className="flex justify-between p-2 space-x-4">
               <Select
                 value={months[getMonth(fromDate)]}
@@ -243,9 +230,12 @@ export default function SearchBar({ refetch }: SearchBarProps) {
           </PopoverContent>
         </Popover>
 
-        <Button type="submit" className="bg-primary hover:bg-primary/90">
-          <Search className="mr-2 h-4 w-4" />
-          Search
+        <Button 
+          type="submit" 
+          className="bg-primary hover:bg-primary/90 h-10 shrink-0"
+        >
+          <Search className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Search</span>
         </Button>
       </div>
     </form>

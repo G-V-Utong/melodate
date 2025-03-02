@@ -19,6 +19,10 @@ module.exports = {
         "2xl": "1400px",
       },
     },
+    containerMobile: {
+      center: true,
+      padding: "1rem",
+    },
     extend: {
       colors: {
         border: "hsl(var(--border))",

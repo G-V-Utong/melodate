@@ -71,14 +71,14 @@ export default function SearchResultItem({ id, title, artist, album, year, cover
       </Card>
 
       {/* List view for mobile */}
-      <div className="flex items-center space-x-4 p-4 bg-card hover:bg-accent rounded-lg transition-colors md:hidden">
+      <div className="flex items-center space-x-4 p-2 bg-card hover:bg-accent rounded-lg transition-colors md:hidden">
         <div className="relative w-16 h-16 flex-shrink-0">
           <Image src={coverArt || "/placeholder.svg"} alt={`${album} cover`} fill className="object-cover rounded-md" />
         </div>
         <div className="flex-grow min-w-0">
-          <h3 className="text-lg font-semibold truncate">{title}</h3>
-          <p className="text-sm text-muted-foreground truncate">{artist}</p>
-          <p className="text-sm text-muted-foreground truncate">
+          <h3 className="text-sm font-semibold truncate">{title}</h3>
+          <p className="text-xs text-muted-foreground truncate">{artist}</p>
+          <p className="text-xs text-muted-foreground truncate">
             {album} ({year})
           </p>
         </div>

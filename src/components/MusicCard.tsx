@@ -1,35 +1,34 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSession } from "next-auth/react";
-import { supabase } from "@/lib/supabase"; 
-import { Button } from "./ui/button";
+"use client"
+
+import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface MusicCardProps {
-  item: {id: number; name: string; artists: { name: string }[]; release_date: string; type: string };
+  title: string
+  artist: string
+  coverArt: string
+  url: string
 }
 
-export function MusicCard({ item }: MusicCardProps) {
-  const { data: session } = useSession();
-
-  const saveFavorite = async () => {
-    if (!session) return alert("Please log in");
-    if (!session.user) return alert("User data not found");
-    await supabase.from("favorites").insert({
-      user_id: session.user.id,
-      spotify_id: item.id,
-      type: item.type,
-    });
-  };
+export function MusicCard({ title, artist, coverArt, url }: MusicCardProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{item.name}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p>Artist: {item.artists.map((a) => a.name).join(", ")}</p>
-        <p>Release Date: {item.release_date}</p>
-        <p>Type: {item.type}</p>
+    <Card className="overflow-hidden border-0 bg-transparent hover:scale-105 transition-transform duration-200">
+      <CardContent className="p-0">
+        <a href={url} target="_blank" rel="noopener noreferrer" className="group block">
+          <div className="relative aspect-square overflow-hidden rounded-lg shadow-lg">
+            <Image
+              src={coverArt}
+              alt={title}
+              fill
+              className="object-cover"
+            />
+          </div>
+          <div className="mt-2">
+            <h3 className="font-medium leading-none line-clamp-1">{title}</h3>
+            <p className="text-sm text-muted-foreground line-clamp-1">{artist}</p>
+          </div>
+        </a>
       </CardContent>
-      {session && <Button onClick={saveFavorite}>Save</Button>}
     </Card>
-  );
+  )
 }

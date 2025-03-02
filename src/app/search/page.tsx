@@ -169,8 +169,8 @@ export default function SearchResults() {
 
       <main className="container py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">Search Results</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-xl font-bold">Search Results</h1>
+          <p className="text-xs text-muted-foreground">
             {isLoading
               ? "Loading..."
               : `${
@@ -186,9 +186,9 @@ export default function SearchResults() {
         ) : results.length > 0 ? (
           <div>
             {uniqueAlbumInfo && (
-              <h1 className="text-2xl font-bold my-4">Albums</h1>
+              <h1 className="md:text-2xl font-bold my-4">Albums</h1>
             )}
-            <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 space-y-4 md:space-y-0">
+            <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
               {uniqueAlbumInfo.map(
                 (albumInfo: {
                   id: number;
@@ -206,9 +206,9 @@ export default function SearchResults() {
               )}
             </div>
             {trackInfo && (
-              <h1 className="text-2xl font-bold mt-10 mb-4">Tracks</h1>
+              <h1 className="md:text-2xl font-bold mt-10 mb-4">Tracks</h1>
             )}
-            <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 space-y-4 md:space-y-0">
+            <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
               {trackInfo.map(
                 (trackInfo: {
                   id: number;
