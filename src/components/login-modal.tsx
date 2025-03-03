@@ -17,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { signInWithGoogle } from "@/lib/supabase"
+import { supabase } from "@/lib/supabase"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -31,29 +32,25 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
   const [isLoading, setIsLoading] = useState(false)
   const [user, setUser] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      const data = await res.json()
+      if (error) throw error
 
-      if (data.success) {
-        setUser(data.user)
+      if (data.user) {
+        toast.success('Logged in successfully')
         onLoginSuccess(data.user)
-        toast.success("Logged in successfully")
         onClose()
-      } else {
-        toast.error(data.message || "Login failed")
       }
-    } catch (error) {
-      toast.error("Something went wrong")
+    } catch (error: any) {
+      toast.error(error.message)
     } finally {
       setIsLoading(false)
     }
@@ -81,7 +78,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
           <DialogDescription>Sign in to your Melodate account to continue your musical journey</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+        <form onSubmit={handleLogin} className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input

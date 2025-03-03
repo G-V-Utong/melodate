@@ -27,6 +27,8 @@ import AuthButton from "@/components/auth-button";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AiOutlineSpotify } from "react-icons/ai";
+import { Sidebar } from "@/components/sidebar";
+import { cn } from "@/lib/utils";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -184,170 +186,182 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="containerSmall md:container py-8">
-        <div className="mx-auto max-w-5xl space-y-8">
-          <div className="space-y-2 text-center">
-            <h2 className="text-lg md:text-[40px] font-bold tracking-tight">
-            Relive the Soundtrack of Any Moment!
-            </h2>
-            <p className="text-xs md:text-lg text-muted-foreground ">
-            Search for songs and albums released on any day in history. <br/>Whether it's your birthday, a special anniversary, or a throwback <br/>to a golden era, find the music that defined the moment.
-            </p>
+      <div className="flex h-[calc(100vh-4rem)]">
+        <Sidebar isVisible={!!user} />
+        <main className={cn(
+          "flex-1 overflow-y-auto py-8",
+          user ? "md:w-[calc(100%-300px)] md:ml-[300px]" : ""
+        )}>
+          <div className={cn(
+            "mx-auto max-w-5xl px-4",
+            user ? "md:mr-[200px] 2xl:mr-auto 2xl:max-w-[1200px]" : "",
+            "3xl:pl-[150px]"
+          )}>
+            <div className="space-y-8">
+              <div className="space-y-2 text-center">
+                <h2 className="text-lg md:text-[40px] font-bold tracking-tight">
+                Relive the Soundtrack of Any Moment!
+                </h2>
+                <p className="text-xs md:text-lg text-muted-foreground ">
+                Search for songs and albums released on any day in history. <br/>Whether it's your birthday, a special anniversary, or a throwback <br/>to a golden era, find the music that defined the moment.
+                </p>
+              </div>
+
+              <SearchBar refetch={refetch} />
+
+              <Tabs defaultValue="trending" className="hidden md:block">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="trending">Trending</TabsTrigger>
+                  <TabsTrigger value="new-releases">New Releases</TabsTrigger>
+                  <TabsTrigger value="top-rated">Top Rated</TabsTrigger>
+                  <TabsTrigger value="recommended">Recommended</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="trending" className="mt-6">
+                  <MusicGrid
+                    category="Trending"
+                    data={trending?.tracks?.items.map((item) => item.track)}
+                    isLoading={trendingLoading}
+                  />
+                </TabsContent>
+
+                <TabsContent value="new-releases" className="mt-6">
+                  <MusicGrid
+                    category="New Releases"
+                    data={newReleases?.albums?.items}
+                    isLoading={newReleasesLoading}
+                  />
+                </TabsContent>
+
+                <TabsContent value="top-rated" className="mt-6">
+                  <MusicGrid
+                    category="Top Rated"
+                    data={topRated?.tracks?.items.map((item) => item.track)}
+                    isLoading={topRatedLoading}
+                  />
+                </TabsContent>
+
+                <TabsContent value="recommended" className="mt-6">
+                  <MusicGrid
+                    category="Recommended"
+                    data={recommended?.tracks?.items.map((item) => item.track)}
+                    isLoading={recommendedLoading}
+                  />
+                </TabsContent>
+              </Tabs>
+              <div className="md:hidden space-y-8">
+                <div className="">
+                  <h2 className="text-2xl font-semibold px-4">Trending</h2>
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent className="-ml-2">
+                        {trending?.tracks?.items.map((item, index) => (
+                          <CarouselItem key={index} className="pl-2 basis-[45%]">
+                            <MusicCard
+                              title={item.name || item.track.name}
+                              artist={
+                                item.artists
+                                  ? item.artists
+                                      .map((artist) => artist.name)
+                                      .join(", ")
+                                  : item.track.artists
+                                      .map((artist) => artist.name)
+                                      .join(", ")
+                              }
+                              coverArt={
+                                item.album?.images[0]?.url ||
+                                item.track?.album?.images[0]?.url
+                              }
+                              url={
+                                item.external_urls?.spotify ||
+                                item.track?.external_urls?.spotify
+                              }
+                            />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                      <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                    </Carousel>
+                  </div>
+                </div>
+
+                <div className="">
+                  <h2 className="text-2xl font-semibold px-4">New Releases</h2>
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent className="-ml-2">
+                        {newReleases?.albums?.items.map((item, index) => (
+                          <CarouselItem key={index} className="pl-2 basis-[45%]">
+                            <MusicCard
+                              title={item.name}
+                              artist={item.artists
+                                .map((artist) => artist.name)
+                                .join(", ")}
+                              coverArt={item.images[0]?.url}
+                              url={item.external_urls.spotify}
+                            />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                      <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                    </Carousel>
+                  </div>
+                </div>
+
+                <div className="">
+                  <h2 className="text-2xl font-semibold px-4">Top Rated</h2>
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent className="-ml-2">
+                        {topRated?.tracks?.items.map((item, index) => (
+                          <CarouselItem key={index} className="pl-2 basis-[45%]">
+                            <MusicCard
+                              title={item.track.name}
+                              artist={item.track.artists
+                                .map((artist) => artist.name)
+                                .join(", ")}
+                              coverArt={item.track.album.images[0]?.url}
+                              url={item.track.external_urls.spotify}
+                            />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                      <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                    </Carousel>
+                  </div>
+                </div>
+
+                <div className="">
+                  <h2 className="text-2xl font-semibold px-4">Recommended</h2>
+                  <div className="relative">
+                    <Carousel className="w-full">
+                      <CarouselContent className="-ml-2">
+                        {recommended?.tracks?.items.map((item, index) => (
+                          <CarouselItem key={index} className="pl-2 basis-[45%]">
+                            <MusicCard
+                              title={item.track.name}
+                              artist={item.track.artists
+                                .map((artist) => artist.name)
+                                .join(", ")}
+                              coverArt={item.track.album.images[0]?.url}
+                              url={item.track.external_urls.spotify}
+                            />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                      <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
+                    </Carousel>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-
-          <SearchBar refetch={refetch} />
-
-          <Tabs defaultValue="trending" className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="trending">Trending</TabsTrigger>
-              <TabsTrigger value="new-releases">New Releases</TabsTrigger>
-              <TabsTrigger value="top-rated">Top Rated</TabsTrigger>
-              <TabsTrigger value="recommended">Recommended</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="trending" className="mt-6">
-              <MusicGrid
-                category="Trending"
-                data={trending?.tracks?.items.map((item) => item.track)}
-                isLoading={trendingLoading}
-              />
-            </TabsContent>
-
-            <TabsContent value="new-releases" className="mt-6">
-              <MusicGrid
-                category="New Releases"
-                data={newReleases?.albums?.items}
-                isLoading={newReleasesLoading}
-              />
-            </TabsContent>
-
-            <TabsContent value="top-rated" className="mt-6">
-              <MusicGrid
-                category="Top Rated"
-                data={topRated?.tracks?.items.map((item) => item.track)}
-                isLoading={topRatedLoading}
-              />
-            </TabsContent>
-
-            <TabsContent value="recommended" className="mt-6">
-              <MusicGrid
-                category="Recommended"
-                data={recommended?.tracks?.items.map((item) => item.track)}
-                isLoading={recommendedLoading}
-              />
-            </TabsContent>
-          </Tabs>
-          <div className="md:hidden space-y-8">
-            <div className="">
-              <h2 className="text-2xl font-semibold px-4">Trending</h2>
-              <div className="relative">
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2">
-                    {trending?.tracks?.items.map((item, index) => (
-                      <CarouselItem key={index} className="pl-2 basis-[45%]">
-                        <MusicCard
-                          title={item.name || item.track.name}
-                          artist={
-                            item.artists
-                              ? item.artists
-                                  .map((artist) => artist.name)
-                                  .join(", ")
-                              : item.track.artists
-                                  .map((artist) => artist.name)
-                                  .join(", ")
-                          }
-                          coverArt={
-                            item.album?.images[0]?.url ||
-                            item.track?.album?.images[0]?.url
-                          }
-                          url={
-                            item.external_urls?.spotify ||
-                            item.track?.external_urls?.spotify
-                          }
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                </Carousel>
-              </div>
-            </div>
-
-            <div className="">
-              <h2 className="text-2xl font-semibold px-4">New Releases</h2>
-              <div className="relative">
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2">
-                    {newReleases?.albums?.items.map((item, index) => (
-                      <CarouselItem key={index} className="pl-2 basis-[45%]">
-                        <MusicCard
-                          title={item.name}
-                          artist={item.artists
-                            .map((artist) => artist.name)
-                            .join(", ")}
-                          coverArt={item.images[0]?.url}
-                          url={item.external_urls.spotify}
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                </Carousel>
-              </div>
-            </div>
-
-            <div className="">
-              <h2 className="text-2xl font-semibold px-4">Top Rated</h2>
-              <div className="relative">
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2">
-                    {topRated?.tracks?.items.map((item, index) => (
-                      <CarouselItem key={index} className="pl-2 basis-[45%]">
-                        <MusicCard
-                          title={item.track.name}
-                          artist={item.track.artists
-                            .map((artist) => artist.name)
-                            .join(", ")}
-                          coverArt={item.track.album.images[0]?.url}
-                          url={item.track.external_urls.spotify}
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                </Carousel>
-              </div>
-            </div>
-
-            <div className="">
-              <h2 className="text-2xl font-semibold px-4">Recommended</h2>
-              <div className="relative">
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2">
-                    {recommended?.tracks?.items.map((item, index) => (
-                      <CarouselItem key={index} className="pl-2 basis-[45%]">
-                        <MusicCard
-                          title={item.track.name}
-                          artist={item.track.artists
-                            .map((artist) => artist.name)
-                            .join(", ")}
-                          coverArt={item.track.album.images[0]?.url}
-                          url={item.track.external_urls.spotify}
-                        />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="absolute -left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                  <CarouselNext className="absolute -right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background/90 border border-border h-8 w-8" />
-                </Carousel>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
       <LoginModal
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}

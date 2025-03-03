@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { saveSearch, supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 // Add refetch as a prop
 interface SearchBarProps {
@@ -70,10 +72,11 @@ export default function SearchBar({ refetch }: SearchBarProps) {
     setToDate(new Date());
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!query && !dateRange) {
       return;
     }
+
     // Update URL with search params
     const params = new URLSearchParams();
     if (query) params.set("q", query);
@@ -82,13 +85,33 @@ export default function SearchBar({ refetch }: SearchBarProps) {
     if (dateRange?.to) params.set("to", format(dateRange.to, "yyyy-MM-dd"));
     
     const newPath = pathname.includes("/search") ? pathname : "/search";
-
     router.push(`${newPath}?${params.toString()}`);
+
+    // Save search if user is logged in
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Current user:', user); // Debug log
+
+      if (user) {
+        await saveSearch(user.id, {
+          query,
+          searchType,
+          dateRange: dateRange ? {
+            from: dateRange.from,
+            to: dateRange.to
+          } : undefined
+        });
+        toast.success('Search saved');
+      } else {
+        console.log('No user logged in'); // Debug log
+      }
+    } catch (error: any) {
+      console.error('Error saving search:', error); // Debug log
+      toast.error("Your search couldn't be saved to history");
+    }
 
     if (typeof refetch === "function") {
       refetch();
-    } else {
-      console.error("Refetch function is not available:", refetch);
     }
   };
 

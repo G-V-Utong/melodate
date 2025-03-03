@@ -19,3 +19,52 @@ export const signInWithGoogle = async () => {
 
   return { data, error };
 };
+
+export async function saveSearch(userId: string, searchData: {
+  query: string;
+  searchType: string;
+  dateRange?: { from?: Date; to?: Date };
+}) {
+  console.log('Saving search:', { userId, searchData }); // Debug log
+
+  try {
+    const { error } = await supabase
+      .from('search_history')
+      .insert({
+        user_id: userId,
+        query: searchData.query || '',
+        search_type: searchData.searchType,
+        date_range: searchData.dateRange ? {
+          from: searchData.dateRange.from?.toISOString(),
+          to: searchData.dateRange.to?.toISOString()
+        } : null
+      });
+
+    if (error) {
+      console.error('Supabase error:', error); // Debug log
+      throw error;
+    }
+
+    console.log('Search saved successfully'); // Debug log
+    return true;
+  } catch (error) {
+    console.error('Error in saveSearch:', error); // Debug log
+    throw error;
+  }
+}
+
+export async function getRecentSearches(userId: string) {
+  const { data, error } = await supabase
+    .from('search_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error('Error fetching recent searches:', error);
+    throw error;
+  }
+
+  return data;
+}

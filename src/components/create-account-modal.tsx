@@ -26,6 +26,7 @@ interface CreateAccountModalProps {
 
 export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }: CreateAccountModalProps) {
   const [email, setEmail] = useState("")
+  const [displayName, setDisplayName] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +45,7 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }:
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, confirmPassword }),
+        body: JSON.stringify({ email, password, confirmPassword, displayName }),
       })
 
       const data = await res.json()
@@ -85,6 +86,17 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }:
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Full Name</Label>
+            <Input
+              id="displayName"
+              type="text"
+              placeholder="John Doe"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input

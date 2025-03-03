@@ -21,6 +21,7 @@ export function MusicCard({ title, artist, coverArt, url }: MusicCardProps) {
               alt={title}
               fill
               className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
           <div className="mt-2">
