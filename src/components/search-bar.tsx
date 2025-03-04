@@ -90,7 +90,6 @@ export default function SearchBar({ refetch }: SearchBarProps) {
     // Save search if user is logged in
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      console.log('Current user:', user); // Debug log
 
       if (user) {
         await saveSearch(user.id, {
@@ -103,7 +102,7 @@ export default function SearchBar({ refetch }: SearchBarProps) {
         });
         toast.success('Search saved');
       } else {
-        console.log('No user logged in'); // Debug log
+        return
       }
     } catch (error: any) {
       console.error('Error saving search:', error); // Debug log

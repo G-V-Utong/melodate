@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MusicCard } from "@/components/MusicCard"; // Custom component
-import { Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import SearchBar from "@/components/search-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicGrid from "@/components/music-grid";
@@ -30,6 +30,8 @@ import { AiOutlineSpotify } from "react-icons/ai";
 import { Sidebar } from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { RxHamburgerMenu } from "react-icons/rx";
+import MenuButton from "@/components/menuButton";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -61,7 +63,7 @@ export default function Home() {
   // });
 
   // const handleSearch = () => refetch()
-
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -151,20 +153,21 @@ export default function Home() {
     localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
   };
 
-  const checkLoggedUser = async () => {
-    const { data: session } = await supabase.auth.getSession();
-    const userLogged = session?.session?.user;
-    console.log("User session:", userLogged);
-  }
+  // const checkLoggedUser = async () => {
+  //   const { data: session } = await supabase.auth.getSession();
+  //   const userLogged = session?.session?.user;
+  // }
 
   const handleLogout = () => {
     setUser(null); // Clear user state
     localStorage.removeItem("user"); // Remove user data from localStorage
   };
 
-  useEffect(()=> {
-    checkLoggedUser()
-  }, [])
+  // useEffect(()=> {
+  //   checkLoggedUser()
+  // }, [])
+
+  
 
   return (
     <div className="min-h-screen bg-background">
@@ -174,19 +177,13 @@ export default function Home() {
             <Search className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Discover
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              New Releases
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Top Charts
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Playlists
-            </a>
+          <nav className="hidden lg:flex items-center gap-6">
+            {user ? <a href="/recent" className="text-sm font-medium hover:text-primary">
+              Recent Searches
+            </a> : ''}
+            {user ? <a href="/likes" className="text-sm font-medium hover:text-primary">
+              My Likes
+            </a> : ''}
           </nav>
           <div className="flex items-center">
             <AuthButton
@@ -194,6 +191,12 @@ export default function Home() {
               user={user}
               handleLogout={handleLogout}
             />
+           <div className="lg:hidden">
+           <MenuButton
+              user={user}
+              onLoginClick={() => setDropdownOpen((prev) => !prev)}
+            />
+           </div>
           </div>
         </div>
       </header>
@@ -201,12 +204,12 @@ export default function Home() {
       <div className="flex h-[calc(100vh-4rem)]">
         <Sidebar isVisible={!!user} />
         <main className={cn(
-          "flex-1 overflow-y-auto py-8",
-          user ? "md:w-[calc(100%-300px)] md:ml-[300px]" : ""
+          "flex-1 overflow-y-auto py-8 md:px-10 lg:px-0",
+          user ? "lg:w-[calc(100%-300px)] lg:ml-[300px]" : ""
         )}>
           <div className={cn(
             "mx-auto max-w-5xl px-4",
-            user ? "md:mr-[200px] 2xl:mr-auto 2xl:max-w-[1200px]" : "",
+            user ? "lg:mr-[100px] 2xl:mr-auto 2xl:max-w-[1200px]" : "",
             "3xl:pl-[150px]"
           )}>
             <div className="space-y-8">
@@ -261,7 +264,7 @@ export default function Home() {
                   />
                 </TabsContent>
               </Tabs>
-              <div className="md:hidden space-y-8">
+              <div className="md:hidden space-y-4">
                 <div className="">
                   <h2 className="text-2xl font-semibold px-4">Trending</h2>
                   <div className="relative">

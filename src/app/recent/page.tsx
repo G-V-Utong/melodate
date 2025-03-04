@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { getRecentSearches, supabase } from "@/lib/supabase"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import LoginModal from "@/components/login-modal"
-import CreateAccountModal from "@/components/create-account-modal"
+import { useEffect, useState } from "react";
+import { getRecentSearches, supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import LoginModal from "@/components/login-modal";
+import CreateAccountModal from "@/components/create-account-modal";
 import { Heading1, Search, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/search-bar";
 import { useSearchParams } from "next/navigation";
 import AuthButton from "@/components/auth-button";
-import { Button } from "@/components/ui/button"
-import { Sidebar } from "@/components/sidebar"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns/format"
+import { Button } from "@/components/ui/button";
+import { Sidebar } from "@/components/sidebar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns/format";
+import { capitalizeWords } from "@/lib/helperFunctions";
+import { RxHamburgerMenu } from "react-icons/rx";
+import MenuButton from "@/components/menuButton";
+import { toast } from "sonner";
 
 const fetchReleases = async (filters: {
   dateRange?: { from?: string; to?: string };
@@ -29,20 +33,19 @@ const fetchReleases = async (filters: {
   return res.json();
 };
 
-
 interface SearchHistoryItem {
-  id: string
-  query: string
-  search_type: string
-  date_range: { from?: string; to?: string }
-  created_at: string
+  id: string;
+  query: string;
+  search_type: string;
+  date_range: { from?: string; to?: string };
+  created_at: string;
 }
 
 export default function RecentSearches() {
-  const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-
+  const [recentSearches, setRecentSearches] = useState<SearchHistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
   const type = searchParams.get("type") || "genre"; // Default to genre
@@ -54,7 +57,6 @@ export default function RecentSearches() {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
-  
 
   const handleSwitchToCreateAccount = () => {
     setLoginModalOpen(false);
@@ -150,20 +152,22 @@ export default function RecentSearches() {
   useEffect(() => {
     async function fetchSearches() {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (user) {
-          const searches = await getRecentSearches(user.id)
-          setRecentSearches(searches)
+          const searches = await getRecentSearches(user.id);
+          setRecentSearches(searches);
         }
       } catch (error) {
-        console.error('Error fetching searches:', error)
+        toast.error('Unable to fetch Recent Searches');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    fetchSearches()
-  }, [])
+    fetchSearches();
+  }, []);
 
   const handleLogout = () => {
     setUser(null); // Clear user state
@@ -173,12 +177,12 @@ export default function RecentSearches() {
   // Add this function for development/debugging
   async function logAllSearches() {
     const { data, error } = await supabase
-      .from('search_history')
-      .select('*, auth.users(email)')
-      .order('created_at', { ascending: false });
+      .from("search_history")
+      .select("*, auth.users(email)")
+      .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching searches:', error);
+      toast.error("Error fetching searches");
       return;
     }
 
@@ -187,23 +191,23 @@ export default function RecentSearches() {
 
   // Call it in useEffect or add a debug button
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       logAllSearches();
     }
   }, []);
 
   const handleSearchClick = (search: SearchHistoryItem) => {
-    const params = new URLSearchParams()
-    if (search.query) params.set("q", search.query)
-    if (search.search_type) params.set("type", search.search_type)
-    if (search.date_range?.from) params.set("from", search.date_range.from)
-    if (search.date_range?.to) params.set("to", search.date_range.to)
-    
-    router.push(`/search?${params.toString()}`)
-  }
+    const params = new URLSearchParams();
+    if (search.query) params.set("q", search.query);
+    if (search.search_type) params.set("type", search.search_type);
+    if (search.date_range?.from) params.set("from", search.date_range.from);
+    if (search.date_range?.to) params.set("to", search.date_range.to);
+
+    router.push(`/search?${params.toString()}`);
+  };
 
   if (loading) {
-    return <div className="container py-8">Loading...</div>
+    return <div className="container py-8">Loading...</div>;
   }
 
   return (
@@ -215,18 +219,29 @@ export default function RecentSearches() {
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Discover
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              New Releases
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Top Charts
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Playlists
-            </a>
+          <Link href="/" className="text-sm font-medium hover:text-primary">
+              Home
+            </Link>
+            {user ? (
+              <a
+                href="/recent"
+                className="text-sm font-medium hover:text-primary"
+              >
+                Recent Searches
+              </a>
+            ) : (
+              ''
+            )}
+           {user ? (
+              <a
+                href="/recent"
+                className="text-sm font-medium hover:text-primary"
+              >
+                My Likes
+              </a>
+            ) : (
+              ''
+            )}
           </nav>
           <div className="flex items-center">
             <AuthButton
@@ -234,6 +249,12 @@ export default function RecentSearches() {
               user={user}
               handleLogout={handleLogout}
             />
+            <div className="lg:hidden">
+              <MenuButton
+                user={user}
+                onLoginClick={() => setDropdownOpen((prev) => !prev)}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -242,57 +263,70 @@ export default function RecentSearches() {
           <SearchBar refetch={refetch} /> 
         </div> */}
       </header>
-     
-    <div className="flex h-[calc(100vh-4rem)]">
+
+      <div className="flex h-[calc(100vh-4rem)]">
         <Sidebar isVisible={!!user} />
-        <main className={cn(
-          "flex-1 overflow-y-auto py-8",
-          user ? "md:w-[calc(100%-300px)] md:ml-[300px]" : ""
-        )}>
-          <div className={cn(
-            "mx-auto max-w-5xl px-4",
-            user ? "md:mr-[200px] 2xl:mr-auto 2xl:max-w-[1200px]" : "",
-            "3xl:pl-[150px]"
-          )}>
-            <div className="container py-8">
-      <h1 className="text-2xl font-bold mb-6">Recent Searches</h1>
-      <div className="space-y-4">
-        {recentSearches ? (recentSearches.map((search) => (
-          <Button
-            key={search.id}
-            variant="outline"
-            className="w-full justify-start text-left"
-            onClick={() => handleSearchClick(search)}
+        <main
+          className={cn(
+            "flex-1 overflow-y-auto",
+            user ? "md:w-[calc(100%-300px)]" : ""
+          )}
+        >
+          <div
+            className={cn(
+              "flex-1 overflow-y-auto md:px-10 lg:px-0",
+              user ? "lg:w-[calc(100%-300px)] lg:ml-[300px]" : ""
+            )}
           >
-            <div className="flex items-center gap-2">
-              {search.search_type === "date" ? (
-                <Calendar className="h-4 w-4" />
-              ) : (
-                <Search className="h-4 w-4" />
-              )}
-              <div>
-                <p className="font-medium">
-                  {search.query || "Date Search"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {search.date_range?.from && (
-                    <span>
-                      {format(new Date(search.date_range.from), "PP")}
-                      {search.date_range.to && ` - ${format(new Date(search.date_range.to), "PP")}`}
-                    </span>
-                  )}
-                  <span className="ml-2">
-                    ({format(new Date(search.created_at), "PP")})
-                  </span>
-                </p>
+            <div className="container py-8">
+              <h1 className="text-2xl font-bold mb-6">Recent Searches</h1>
+              <div className="space-y-4">
+                {recentSearches ? (
+                  recentSearches.map((search) => (
+                    <Button
+                      key={search.id}
+                      variant="outline"
+                      className="w-full justify-start text-left py-8"
+                      onClick={() => handleSearchClick(search)}
+                    >
+                      <div className="flex items-center gap-2">
+                        {search.search_type === "date" ? (
+                          <Calendar className="h-4 w-4" />
+                        ) : (
+                          <Search className="h-4 w-4" />
+                        )}
+                        <div>
+                          <p className="font-medium">
+                            {capitalizeWords(search.query) || "Date Search"}
+                          </p>
+                          <div className="text-xs text-muted-foreground flex justify-between w-full">
+                            {search.date_range?.from && (
+                              <p>
+                                {format(new Date(search.date_range.from), "PP")}
+                                {search.date_range.to &&
+                                  ` - ${format(
+                                    new Date(search.date_range.to),
+                                    "PP"
+                                  )}`}
+                              </p>
+                            )}
+                            <p className="ml-2 text-right">
+                              Searched:{" "}
+                              {format(new Date(search.created_at), "PP")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Button>
+                  ))
+                ) : (
+                  <p>
+                    You currently don&apos;t have any searches. Search for music
+                    by artist or genre to begin
+                  </p>
+                )}
               </div>
             </div>
-          </Button>
-        ))) : 
-          <p>You currently don&apos;t have any searches. Search for music by artist or genre to begin</p>
-        }
-      </div>
-    </div>
           </div>
         </main>
       </div>
@@ -308,5 +342,5 @@ export default function RecentSearches() {
         onSwitchToLogin={handleSwitchToLogin}
       />
     </div>
-  )
-} 
+  );
+}

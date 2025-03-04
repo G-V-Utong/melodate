@@ -21,7 +21,6 @@ export default function MusicGrid({
   data,
   isLoading,
 }: MusicGridProps) {
-  // console.log(data);
 
   return (
     <div className="space-y-4">

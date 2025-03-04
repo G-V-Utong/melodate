@@ -31,8 +31,6 @@ export async function POST(request: Request) {
       success: true,
       user: data.user
     });
-
-    console.log(loggedInUser)
     return loggedInUser
 
   } catch (error) {

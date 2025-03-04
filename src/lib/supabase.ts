@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -25,7 +26,6 @@ export async function saveSearch(userId: string, searchData: {
   searchType: string;
   dateRange?: { from?: Date; to?: Date };
 }) {
-  console.log('Saving search:', { userId, searchData }); // Debug log
 
   try {
     const { error } = await supabase
@@ -44,11 +44,8 @@ export async function saveSearch(userId: string, searchData: {
       console.error('Supabase error:', error); // Debug log
       throw error;
     }
-
-    console.log('Search saved successfully'); // Debug log
     return true;
   } catch (error) {
-    console.error('Error in saveSearch:', error); // Debug log
     throw error;
   }
 }
@@ -62,7 +59,7 @@ export async function getRecentSearches(userId: string) {
     .limit(20);
 
   if (error) {
-    console.error('Error fetching recent searches:', error);
+    toast.error('Error fetching recent searches');
     throw error;
   }
 

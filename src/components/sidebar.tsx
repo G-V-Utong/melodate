@@ -36,7 +36,7 @@ export function Sidebar({ isVisible }: SidebarProps) {
   if (!isVisible) return null
 
   return (
-    <div className="hidden md:flex flex-col gap-y-4 h-full w-[300px] p-6 bg-background border-r fixed top-16">
+    <div className="hidden lg:flex flex-col gap-y-4 h-full w-[300px] p-6 bg-background border-r fixed top-16">
       <div className="flex flex-col gap-y-2">
         {routes.map((route) => (
           <Link

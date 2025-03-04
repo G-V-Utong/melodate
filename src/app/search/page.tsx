@@ -12,6 +12,8 @@ import CreateAccountModal from "@/components/create-account-modal";
 import { useState } from "react";
 import AlbumResultItem from "@/components/albumResults";
 import AuthButton from "@/components/auth-button";
+import { RxHamburgerMenu } from "react-icons/rx";
+import MenuButton from "@/components/menuButton";
 
 const fetchReleases = async (filters: {
   dateRange?: { from?: string; to?: string };
@@ -33,6 +35,7 @@ export default function SearchResults() {
   const type = searchParams.get("type") || "genre"; // Default to genre
   const from = searchParams.get("from") || undefined;
   const to = searchParams.get("to") || undefined;
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
   const [user, setUser] = useState(() => {
@@ -131,37 +134,44 @@ export default function SearchResults() {
       url: item.external_urls.spotify,
     })) || [];
 
+    const handleLogout = () => {
+      setUser(null); // Clear user state
+      localStorage.removeItem("user"); // Remove user data from localStorage
+    };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="z-1 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
             <Search className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Discover
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              New Releases
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Top Charts
-            </a>
-            <a href="#" className="text-sm font-medium hover:text-primary">
-              Playlists
-            </a>
+          <nav className="hidden lg:flex items-center gap-6">
+            <Link href="/" className="text-sm font-medium hover:text-primary">
+              Home
+            </Link>
+            {user ? <a href="/recent" className="text-sm font-medium hover:text-primary">
+              Recent Searches
+            </a> : ''}
+            {user ? <a href="/likes" className="text-sm font-medium hover:text-primary">
+              My Likes
+            </a> : ''}
           </nav>
           <div className="flex items-center">
             <AuthButton
               onLoginClick={() => setLoginModalOpen(true)}
               user={user}
+              handleLogout={handleLogout}
+            />
+            <MenuButton
+              user={user}
+              onLoginClick={() => setDropdownOpen((prev) => !prev)}
             />
           </div>
         </div>
       </header>
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container py-4">
           <SearchBar refetch={refetch} /> {/* Pass refetch to SearchBar */}
         </div>
