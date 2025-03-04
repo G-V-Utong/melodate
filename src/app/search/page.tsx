@@ -200,8 +200,8 @@ export default function SearchResults() {
                   genre: string;
                   type: string;
                   url: string;
-                }) => (
-                  <AlbumResultItem key={albumInfo.id} {...albumInfo} />
+                }, index: number) => (
+                  <AlbumResultItem key={`${albumInfo.title}-${index}`} {...albumInfo} />
                 )
               )}
             </div>
@@ -220,8 +220,8 @@ export default function SearchResults() {
                   url: string;
                   genre: string;
                   album: string;
-                }) => (
-                  <SearchResultItem key={trackInfo.id} {...trackInfo} />
+                }, index: number) => (
+                  <SearchResultItem key={`${trackInfo.title}-${index}`} {...trackInfo} />
                 )
               )}
             </div>

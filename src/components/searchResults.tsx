@@ -74,7 +74,7 @@ export default function SearchResultItem({ id, title, artist, album, year, cover
       {/* List view for mobile */}
       <div className="flex items-center space-x-4 p-2 bg-card hover:bg-accent rounded-lg transition-colors md:hidden">
         <div className="relative w-16 h-16 flex-shrink-0">
-          <Image src={coverArt || "/placeholder.svg"} alt={`${album} cover`} fill className="object-cover rounded-md" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+          <Image src={coverArt || "/placeholder.svg"} alt={`${album} cover`} fill className="object-cover rounded-md" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" priority={id === 0}/>
         </div>
         <div className="flex-grow min-w-0">
           <h3 className="text-sm font-semibold truncate">{title}</h3>

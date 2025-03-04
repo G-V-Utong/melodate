@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MusicCard } from "@/components/MusicCard"; // Custom component
 import { Search } from "lucide-react";
@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { AiOutlineSpotify } from "react-icons/ai";
 import { Sidebar } from "@/components/sidebar";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -63,11 +64,12 @@ export default function Home() {
 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
-  const [user, setUser] = useState(() => {
+  const [user, setUser] = useState(null);
     // Retrieve user data from localStorage on initial render
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+    useEffect(() => {
+      const savedUser = localStorage.getItem("user");
+      setUser(savedUser ? JSON.parse(savedUser) : null);
+    }, []);
 
   const handleSwitchToCreateAccount = () => {
     setLoginModalOpen(false);
@@ -149,10 +151,20 @@ export default function Home() {
     localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
   };
 
+  const checkLoggedUser = async () => {
+    const { data: session } = await supabase.auth.getSession();
+    const userLogged = session?.session?.user;
+    console.log("User session:", userLogged);
+  }
+
   const handleLogout = () => {
     setUser(null); // Clear user state
     localStorage.removeItem("user"); // Remove user data from localStorage
   };
+
+  useEffect(()=> {
+    checkLoggedUser()
+  }, [])
 
   return (
     <div className="min-h-screen bg-background">
