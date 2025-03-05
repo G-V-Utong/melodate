@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { signInWithGoogle } from "@/lib/supabase"
 import { supabase } from "@/lib/supabase"
 import ForgotPasswordModal from "./forgot-password-modal"
+import { PasswordInput } from "@/components/ui/password-input"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -114,9 +115,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
                 Forgot password?
               </Button>
             </div>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

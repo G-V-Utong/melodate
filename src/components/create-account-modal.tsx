@@ -17,6 +17,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { signInWithGoogle } from "@/lib/supabase"
+import { PasswordInput } from "@/components/ui/password-input"
 
 interface CreateAccountModalProps {
   isOpen: boolean
@@ -110,9 +111,8 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }:
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -120,9 +120,8 @@ export default function CreateAccountModal({ isOpen, onClose, onSwitchToLogin }:
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirm-password">Confirm Password</Label>
-            <Input
+            <PasswordInput
               id="confirm-password"
-              type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
