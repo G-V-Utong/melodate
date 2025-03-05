@@ -171,7 +171,7 @@ export default function SearchResults() {
           </div>
         </div>
       </header>
-      <header className="sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container py-4">
           <SearchBar refetch={refetch} /> {/* Pass refetch to SearchBar */}
         </div>
