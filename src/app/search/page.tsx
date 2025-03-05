@@ -134,10 +134,10 @@ export default function SearchResults() {
       url: item.external_urls.spotify,
     })) || [];
 
-    const handleLogout = () => {
-      setUser(null); // Clear user state
-      localStorage.removeItem("user"); // Remove user data from localStorage
-    };
+  const handleLogout = () => {
+    setUser(null); // Clear user state
+    localStorage.removeItem("user"); // Remove user data from localStorage
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -151,12 +151,26 @@ export default function SearchResults() {
             <Link href="/" className="text-sm font-medium hover:text-primary">
               Home
             </Link>
-            {user ? <a href="/recent" className="text-sm font-medium hover:text-primary">
-              Recent Searches
-            </a> : ''}
-            {user ? <a href="/likes" className="text-sm font-medium hover:text-primary">
-              My Likes
-            </a> : ''}
+            {user ? (
+              <a
+                href="/recent"
+                className="text-sm font-medium hover:text-primary"
+              >
+                Recent Searches
+              </a>
+            ) : (
+              ""
+            )}
+            {user ? (
+              <a
+                href="/likes"
+                className="text-sm font-medium hover:text-primary"
+              >
+                My Likes
+              </a>
+            ) : (
+              ""
+            )}
           </nav>
           <div className="flex items-center">
             <AuthButton
@@ -164,10 +178,12 @@ export default function SearchResults() {
               user={user}
               handleLogout={handleLogout}
             />
-            <MenuButton
-              user={user}
-              onLoginClick={() => setDropdownOpen((prev) => !prev)}
-            />
+            <div className="lg:hidden">
+              <MenuButton
+                user={user}
+                onLoginClick={() => setDropdownOpen((prev) => !prev)}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -200,18 +216,24 @@ export default function SearchResults() {
             )}
             <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
               {uniqueAlbumInfo.map(
-                (albumInfo: {
-                  id: number;
-                  title: string;
-                  artist: string;
-                  album: string;
-                  year: string;
-                  coverArt: string;
-                  genre: string;
-                  type: string;
-                  url: string;
-                }, index: number) => (
-                  <AlbumResultItem key={`${albumInfo.title}-${index}`} {...albumInfo} />
+                (
+                  albumInfo: {
+                    id: number;
+                    title: string;
+                    artist: string;
+                    album: string;
+                    year: string;
+                    coverArt: string;
+                    genre: string;
+                    type: string;
+                    url: string;
+                  },
+                  index: number
+                ) => (
+                  <AlbumResultItem
+                    key={`${albumInfo.title}-${index}`}
+                    {...albumInfo}
+                  />
                 )
               )}
             </div>
@@ -220,18 +242,24 @@ export default function SearchResults() {
             )}
             <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
               {trackInfo.map(
-                (trackInfo: {
-                  id: number;
-                  title: string;
-                  artist: string;
-                  year: string;
-                  coverArt: string;
-                  type: string;
-                  url: string;
-                  genre: string;
-                  album: string;
-                }, index: number) => (
-                  <SearchResultItem key={`${trackInfo.title}-${index}`} {...trackInfo} />
+                (
+                  trackInfo: {
+                    id: number;
+                    title: string;
+                    artist: string;
+                    year: string;
+                    coverArt: string;
+                    type: string;
+                    url: string;
+                    genre: string;
+                    album: string;
+                  },
+                  index: number
+                ) => (
+                  <SearchResultItem
+                    key={`${trackInfo.title}-${index}`}
+                    {...trackInfo}
+                  />
                 )
               )}
             </div>

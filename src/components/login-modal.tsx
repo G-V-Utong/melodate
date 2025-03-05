@@ -18,6 +18,7 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { signInWithGoogle } from "@/lib/supabase"
 import { supabase } from "@/lib/supabase"
+import ForgotPasswordModal from "./forgot-password-modal"
 
 interface LoginModalProps {
   isOpen: boolean
@@ -31,6 +32,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [user, setUser] = useState("")
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,6 +72,14 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
     }
   }
 
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true)
+  }
+
+  const handleBackToLogin = () => {
+    setShowForgotPassword(false)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
@@ -93,7 +103,14 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Button variant="link" className="h-auto p-0 text-xs">
+              <Button 
+                variant="link" 
+                className="h-auto p-0 text-xs"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleForgotPassword()
+                }}
+              >
                 Forgot password?
               </Button>
             </div>
@@ -164,6 +181,12 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
           </div>
         </DialogFooter>
       </DialogContent>
+
+      <ForgotPasswordModal 
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onBackToLogin={handleBackToLogin}
+      />
     </Dialog>
   )
 }
