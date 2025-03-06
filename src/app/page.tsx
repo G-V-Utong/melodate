@@ -189,12 +189,12 @@ export default function Home() {
               user={user}
               handleLogout={handleLogout}
             />
-           <div className="lg:hidden">
+           {user && <div className="lg:hidden">
            <MenuButton
               user={user}
               onLoginClick={() => setDropdownOpen((prev) => !prev)}
             />
-           </div>
+           </div>}
           </div>
         </div>
       </header>
