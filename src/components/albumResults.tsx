@@ -70,7 +70,7 @@ export default function AlbumResultItem({ title, artist, year, coverArt, type, u
       </Card>
 
       {/* List view for mobile */}
-      <a href={url} target="_blank" rel="noopener noreferrer" className="block">      
+      <a href={url} target="_blank" rel="noopener noreferrer" className="block md:hidden">      
         <div className="flex items-center space-x-4 p-2 bg-card hover:bg-accent rounded-lg transition-colors md:hidden">
         <div className="relative w-16 h-16 flex-shrink-0">
           <Image src={coverArt || "/placeholder.svg"} alt={`${type} cover`} fill className="object-cover rounded-md" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"/>
