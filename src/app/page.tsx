@@ -216,7 +216,7 @@ export default function Home() {
                 Relive the Soundtrack of Any Moment!
                 </h2>
                 <p className="text-xs md:text-lg text-muted-foreground ">
-                Search for songs and albums released on any day in history. <br/>Whether it&apos;s your birthday, a special anniversary, or a throwback <br/>to a golden era, find the music that defined the moment.
+                Search for songs and albums released on any day in history. Whether it&apos;s your birthday, a special anniversary, or a throwback to a golden era, find the music that defined the moment.
                 </p>
               </div>
 
