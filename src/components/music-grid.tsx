@@ -45,7 +45,7 @@ export default function MusicGrid({
                   priority={index === 0}
                 />
                 <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <Button
+                  <Button onClick={() => window.open(item.external_urls.spotify)}
                     size="icon"
                     variant="secondary"
                     className="rounded-full flex items-center justify-center gap-1 px-2 py-1 transition-all duration-300 group-hover:w-20 bg-[#1DB954] hover:bg-[#1DB954]"
