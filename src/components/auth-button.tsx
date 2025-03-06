@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
@@ -10,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { supabase } from "@/lib/supabase"
-import type { User } from "@supabase/supabase-js"
 
 interface AuthButtonProps {
   onLoginClick: () => void
@@ -33,10 +34,6 @@ export default function AuthButton({ onLoginClick, user, handleLogout }: AuthBut
     return () => subscription.unsubscribe()
   }, [])
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    localStorage.removeItem()
-  }
 
   if (loading) {
     return <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />

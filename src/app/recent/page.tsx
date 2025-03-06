@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,9 +8,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
-import { Heading1, Search, Calendar } from "lucide-react";
+import { Search, Calendar } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import SearchBar from "@/components/search-bar";
 import { useSearchParams } from "next/navigation";
 import AuthButton from "@/components/auth-button";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,6 @@ import { Sidebar } from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns/format";
 import { capitalizeWords } from "@/lib/helperFunctions";
-import { RxHamburgerMenu } from "react-icons/rx";
 import MenuButton from "@/components/menuButton";
 import { toast } from "sonner";
 

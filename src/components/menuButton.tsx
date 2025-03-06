@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { supabase } from "@/lib/supabase"
-import type { User } from "@supabase/supabase-js"
 import { RxHamburgerMenu } from "react-icons/rx"
 import Link from "next/link"
 
@@ -19,7 +19,7 @@ interface MenuButton {
   user?: any
 }
 
-export default function MenuButton({ onLoginClick, user, }: MenuButton) {
+export default function MenuButton({ user }: MenuButton) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -38,16 +38,6 @@ export default function MenuButton({ onLoginClick, user, }: MenuButton) {
     return <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
   }
 
-//   if (!user) {
-//     return (
-//       <Button
-//         className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-//         onClick={onLoginClick}
-//       >
-//         Login
-//       </Button>
-//     )
-//   }
 
   return (
     <DropdownMenu>

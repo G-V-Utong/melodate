@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MusicCard } from "@/components/MusicCard"; // Custom component
-import { Menu, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import SearchBar from "@/components/search-bar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MusicGrid from "@/components/music-grid";
@@ -25,12 +27,8 @@ import {
 } from "@/components/ui/carousel";
 import AuthButton from "@/components/auth-button";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { AiOutlineSpotify } from "react-icons/ai";
 import { Sidebar } from "@/components/sidebar";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import { RxHamburgerMenu } from "react-icons/rx";
 import MenuButton from "@/components/menuButton";
 
 const fetchReleases = async (filters: {
@@ -235,7 +233,7 @@ export default function Home() {
                 <TabsContent value="trending" className="mt-6">
                   <MusicGrid
                     category="Trending"
-                    data={trending?.tracks?.items.map((item) => item.track)}
+                    data={trending?.tracks?.items.map((item: any) => item.track)}
                     isLoading={trendingLoading}
                   />
                 </TabsContent>
@@ -251,7 +249,7 @@ export default function Home() {
                 <TabsContent value="top-rated" className="mt-6">
                   <MusicGrid
                     category="Top Rated"
-                    data={topRated?.tracks?.items.map((item) => item.track)}
+                    data={topRated?.tracks?.items.map((item: any) => item.track)}
                     isLoading={topRatedLoading}
                   />
                 </TabsContent>
@@ -259,7 +257,7 @@ export default function Home() {
                 <TabsContent value="recommended" className="mt-6">
                   <MusicGrid
                     category="Recommended"
-                    data={recommended?.tracks?.items.map((item) => item.track)}
+                    data={recommended?.tracks?.items.map((item: any) => item.track)}
                     isLoading={recommendedLoading}
                   />
                 </TabsContent>
@@ -270,17 +268,17 @@ export default function Home() {
                   <div className="relative">
                     <Carousel className="w-full">
                       <CarouselContent className="-ml-2">
-                        {trending?.tracks?.items.map((item, index) => (
+                        {trending?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
                               title={item.name || item.track.name}
                               artist={
                                 item.artists
                                   ? item.artists
-                                      .map((artist) => artist.name)
+                                      .map((artist: any) => artist.name)
                                       .join(", ")
                                   : item.track.artists
-                                      .map((artist) => artist.name)
+                                      .map((artist: any) => artist.name)
                                       .join(", ")
                               }
                               coverArt={
@@ -306,12 +304,12 @@ export default function Home() {
                   <div className="relative">
                     <Carousel className="w-full">
                       <CarouselContent className="-ml-2">
-                        {newReleases?.albums?.items.map((item, index) => (
+                        {newReleases?.albums?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
                               title={item.name}
                               artist={item.artists
-                                .map((artist) => artist.name)
+                                .map((artist: any) => artist.name)
                                 .join(", ")}
                               coverArt={item.images[0]?.url}
                               url={item.external_urls.spotify}
@@ -330,12 +328,12 @@ export default function Home() {
                   <div className="relative">
                     <Carousel className="w-full">
                       <CarouselContent className="-ml-2">
-                        {topRated?.tracks?.items.map((item, index) => (
+                        {topRated?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
                               title={item.track.name}
                               artist={item.track.artists
-                                .map((artist) => artist.name)
+                                .map((artist: any) => artist.name)
                                 .join(", ")}
                               coverArt={item.track.album.images[0]?.url}
                               url={item.track.external_urls.spotify}
@@ -354,12 +352,12 @@ export default function Home() {
                   <div className="relative">
                     <Carousel className="w-full">
                       <CarouselContent className="-ml-2">
-                        {recommended?.tracks?.items.map((item, index) => (
+                        {recommended?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
                               title={item.track.name}
                               artist={item.track.artists
-                                .map((artist) => artist.name)
+                                .map((artist: any) => artist.name)
                                 .join(", ")}
                               coverArt={item.track.album.images[0]?.url}
                               url={item.track.external_urls.spotify}

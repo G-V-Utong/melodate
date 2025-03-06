@@ -104,6 +104,7 @@ export default function SearchBar({ refetch }: SearchBarProps) {
       } else {
         return
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Error saving search:', error); // Debug log
       toast.error("Your search couldn't be saved to history");

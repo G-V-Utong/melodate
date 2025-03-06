@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { format } from "date-fns";
-import { Heading1, Search } from "lucide-react";
+
+import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/search-bar";
 import SearchResultItem from "@/components/searchResults";
@@ -12,7 +14,6 @@ import CreateAccountModal from "@/components/create-account-modal";
 import { useState } from "react";
 import AlbumResultItem from "@/components/albumResults";
 import AuthButton from "@/components/auth-button";
-import { RxHamburgerMenu } from "react-icons/rx";
 import MenuButton from "@/components/menuButton";
 
 const fetchReleases = async (filters: {
@@ -69,7 +70,7 @@ export default function SearchResults() {
   // Map Spotify API results to SearchResultItem props
   const results = data?.releases || [];
 
-  const uniqueAlbumInfo = [];
+  const uniqueAlbumInfo: any = [];
   const uniqueIds = new Set(); // Use a Set to track unique IDs
 
   const albumInfo = results

@@ -13,12 +13,11 @@ interface SearchResultItemProps {
   album: string
   year: string
   coverArt: string
-  genre: string
   type: string
   url: string
 }
 
-export default function SearchResultItem({ id, title, artist, album, year, coverArt, genre, type, url }: SearchResultItemProps) {
+export default function SearchResultItem({ id, title, artist, album, year, coverArt, type, url }: SearchResultItemProps) {
 
   return (
     <>

@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from "next/image";
-import { Play, Heart, MoreHorizontal } from "lucide-react";
+import { Heart, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +20,6 @@ interface MusicGridProps {
 export default function MusicGrid({
   category,
   data,
-  isLoading,
 }: MusicGridProps) {
 
   return (

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import type React from "react"
@@ -32,7 +33,6 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [user, setUser] = useState("")
   const [showForgotPassword, setShowForgotPassword] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {

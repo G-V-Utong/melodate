@@ -16,7 +16,7 @@ interface AlbumResultItemProps {
   url: string
 }
 
-export default function AlbumResultItem({ id, title, artist, year, coverArt, type, url }: AlbumResultItemProps) {
+export default function AlbumResultItem({ title, artist, year, coverArt, type, url }: AlbumResultItemProps) {
 
   return (
     <>
