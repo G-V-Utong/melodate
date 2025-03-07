@@ -26,9 +26,9 @@ export default function MusicGrid({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold hidden md:inline-block">{category}</h3>
-        <Button variant="link" className="text-sm">
+        {/* <Button variant="link" className="text-sm">
           View All
-        </Button>
+        </Button> */}
       </div>
 
       <div className="flex md:grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { MusicCard } from "@/components/MusicCard"; // Custom component
@@ -30,6 +30,7 @@ import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
 import { cn } from "@/lib/utils";
 import MenuButton from "@/components/menuButton";
+import { supabase } from "@/lib/supabase";
 
 const fetchReleases = async (filters: {
   date: string;
@@ -156,7 +157,8 @@ export default function Home() {
   //   const userLogged = session?.session?.user;
   // }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
     setUser(null); // Clear user state
     localStorage.removeItem("user"); // Remove user data from localStorage
   };
@@ -171,8 +173,8 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <Link href={"/"} className="cursor-pointer flex items-center gap-2">
-            <Search className="h-6 w-6 text-primary" />
+          <Link href={"/"} className="cursor-pointer flex items-center gap-1">
+            <Image className="text-primary" src="/assets/Melodate Icon.jpg" alt="Melodate Icon" width={20} height={20}/>
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
           <nav className="hidden lg:flex items-center gap-6">
@@ -212,11 +214,11 @@ export default function Home() {
           )}>
             <div className="space-y-8">
               <div className="space-y-2 text-center">
-                <h2 className="text-lg md:text-[40px] font-bold tracking-tight">
+                <h2 className="text-2xl md:text-[40px] font-bold tracking-tight">
                 Relive the Soundtrack of Any Moment!
                 </h2>
-                <p className="text-xs md:text-lg text-muted-foreground ">
-                Search for songs and albums released on any day in history. Whether it&apos;s your birthday, a special anniversary, or a throwback to a golden era, find the music that defined the moment.
+                <p className="text-base md:text-lg text-muted-foreground ">
+                Search for songs and albums released on any day in history. Whether it&apos;s your <span className="font-[700] text-foreground">birth year</span>, a special <span className="font-[700] text-foreground">anniversary</span>, or a throwback to a <span className="font-[700] text-foreground">golden era</span>, find the music that defined the moment.
                 </p>
               </div>
 

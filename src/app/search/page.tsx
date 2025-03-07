@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-
-
+import Image from "next/image";
 import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/search-bar";
@@ -15,6 +14,7 @@ import { useState } from "react";
 import AlbumResultItem from "@/components/albumResults";
 import AuthButton from "@/components/auth-button";
 import MenuButton from "@/components/menuButton";
+import { supabase } from "@/lib/supabase";
 
 const fetchReleases = async (filters: {
   dateRange?: { from?: string; to?: string };
@@ -135,7 +135,8 @@ export default function SearchResults() {
       url: item.external_urls.spotify,
     })) || [];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
     setUser(null); // Clear user state
     localStorage.removeItem("user"); // Remove user data from localStorage
   };
@@ -144,8 +145,14 @@ export default function SearchResults() {
     <div className="min-h-screen bg-background">
       <header className="z-1 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
-            <Search className="h-6 w-6 text-primary" />
+          <Link href={"/"} className="cursor-pointer flex items-center gap-1">
+            <Image
+              className="text-primary"
+              src="/assets/Melodate Icon.jpg"
+              alt="Melodate Icon"
+              width={20}
+              height={20}
+            />
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
           <nav className="hidden lg:flex items-center gap-6">

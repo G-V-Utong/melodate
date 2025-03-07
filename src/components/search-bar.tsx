@@ -33,7 +33,7 @@ export default function SearchBar({ refetch }: SearchBarProps) {
   const [searchType, setSearchType] = useState<"genre" | "artist">("genre");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const router = useRouter();
-  const pathname = usePathname()
+  const pathname = usePathname();
   const [fromDate, setFromDate] = useState<Date>(new Date());
   const [toDate, setToDate] = useState<Date>(new Date());
 
@@ -81,32 +81,37 @@ export default function SearchBar({ refetch }: SearchBarProps) {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (searchType) params.set("type", searchType);
-    if (dateRange?.from) params.set("from", format(dateRange.from, "yyyy-MM-dd"));
+    if (dateRange?.from)
+      params.set("from", format(dateRange.from, "yyyy-MM-dd"));
     if (dateRange?.to) params.set("to", format(dateRange.to, "yyyy-MM-dd"));
-    
+
     const newPath = pathname.includes("/search") ? pathname : "/search";
     router.push(`${newPath}?${params.toString()}`);
 
     // Save search if user is logged in
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       if (user) {
         await saveSearch(user.id, {
           query,
           searchType,
-          dateRange: dateRange ? {
-            from: dateRange.from,
-            to: dateRange.to
-          } : undefined
+          dateRange: dateRange
+            ? {
+                from: dateRange.from,
+                to: dateRange.to,
+              }
+            : undefined,
         });
-        toast.success('Search saved');
+        toast.success("Search saved");
       } else {
-        return
+        return;
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Error saving search:', error); // Debug log
+      console.error("Error saving search:", error); // Debug log
       toast.error("Your search couldn't be saved to history");
     }
 
@@ -124,8 +129,8 @@ export default function SearchBar({ refetch }: SearchBarProps) {
       }}
     >
       <div className="flex items-center gap-2">
-        <Select 
-          value={searchType} 
+        <Select
+          value={searchType}
           onValueChange={(value) => setSearchType(value as "genre" | "artist")}
         >
           <SelectTrigger className="w-[90px] md:w-[120px] bg-white/80 border-0 h-10">
@@ -168,93 +173,103 @@ export default function SearchBar({ refetch }: SearchBarProps) {
               <X className="h-4 w-4" />
             </button>
           )}
-          <PopoverContent className="w-auto p-0" align="end">
-            <div className="flex justify-between p-2 space-x-4">
-              <Select
-                value={months[getMonth(fromDate)]}
-                onValueChange={handleFromMonthChange}
-              >
-                <SelectTrigger className="w-[110px]">
-                  <SelectValue placeholder="Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((month) => (
-                    <SelectItem key={month} value={month}>
-                      {month}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={getYear(fromDate).toString()}
-                onValueChange={handleFromYearChange}
-              >
-                <SelectTrigger className="w-[110px]">
-                  <SelectValue placeholder="Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <PopoverContent className="w-auto p-0 md:pb-3" align="end">
+            <h1 className="text-center py-2 font-[600] text-[14px] hidden md:block">
+              Select a single date or a range
+            </h1>
+            <div className="md:flex">
+              <div className="md:border md:rounded-[10px] md:ml-2 md:mr-1">
+                <h1 className="font-[600] text-xs px-2 pt-2">From:</h1>
+                <div className="flex justify-between p-2 space-x-4">
+                  <Select
+                    value={months[getMonth(fromDate)]}
+                    onValueChange={handleFromMonthChange}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={getYear(fromDate).toString()}
+                    onValueChange={handleFromYearChange}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <CalendarComponent
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  month={fromDate}
+                  onMonthChange={setFromDate}
+                />
+              </div>
+              <div className="md:border md:rounded-[10px] md:ml-1 md:mr-2">
+                <h1 className="font-[600] px-2 pt-2 text-xs">To:</h1>
+                <div className="flex justify-between p-2 space-x-4">
+                  <Select
+                    value={months[getMonth(toDate)]}
+                    onValueChange={handleToMonthChange}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={getYear(toDate).toString()}
+                    onValueChange={handleToYearChange}
+                  >
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <CalendarComponent
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  month={toDate}
+                  onMonthChange={setToDate}
+                />
+              </div>
             </div>
-
-            <CalendarComponent
-              mode="range"
-              selected={dateRange}
-              onSelect={setDateRange}
-              month={fromDate}
-              onMonthChange={setFromDate}
-            />
-
-            <div className="flex justify-between p-2 space-x-4">
-              <Select
-                value={months[getMonth(toDate)]}
-                onValueChange={handleToMonthChange}
-              >
-                <SelectTrigger className="w-[110px]">
-                  <SelectValue placeholder="Month" />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((month) => (
-                    <SelectItem key={month} value={month}>
-                      {month}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Select
-                value={getYear(toDate).toString()}
-                onValueChange={handleToYearChange}
-              >
-                <SelectTrigger className="w-[110px]">
-                  <SelectValue placeholder="Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <CalendarComponent
-              mode="range"
-              selected={dateRange}
-              onSelect={setDateRange}
-              month={toDate}
-              onMonthChange={setToDate}
-            />
           </PopoverContent>
         </Popover>
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="bg-primary hover:bg-primary/90 h-10 shrink-0"
         >
           <Search className="h-4 w-4 sm:mr-2" />

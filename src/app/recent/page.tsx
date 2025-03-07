@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getRecentSearches, supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -160,7 +160,7 @@ export default function RecentSearches() {
           setRecentSearches(searches);
         }
       } catch (error) {
-        toast.error('Unable to fetch Recent Searches');
+        toast.error("Unable to fetch Recent Searches");
       } finally {
         setLoading(false);
       }
@@ -169,7 +169,8 @@ export default function RecentSearches() {
     fetchSearches();
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut({ scope: 'local' })
     setUser(null); // Clear user state
     localStorage.removeItem("user"); // Remove user data from localStorage
   };
@@ -214,12 +215,18 @@ export default function RecentSearches() {
     <div className="min-h-screen bg-background">
       <header className="z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
-          <Link href={"/"} className="flex items-center gap-2 cursor-pointer">
-            <Search className="h-6 w-6 text-primary" />
+          <Link href={"/"} className="cursor-pointer flex items-center gap-1">
+            <Image
+              className="text-primary"
+              src="/assets/Melodate Icon.jpg"
+              alt="Melodate Icon"
+              width={20}
+              height={20}
+            />
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium hover:text-primary">
+            <Link href="/" className="text-sm font-medium hover:text-primary">
               Home
             </Link>
             {user ? (
@@ -230,9 +237,9 @@ export default function RecentSearches() {
                 Recent Searches
               </a>
             ) : (
-              ''
+              ""
             )}
-           {user ? (
+            {user ? (
               <a
                 href="/recent"
                 className="text-sm font-medium hover:text-primary"
@@ -240,7 +247,7 @@ export default function RecentSearches() {
                 My Likes
               </a>
             ) : (
-              ''
+              ""
             )}
           </nav>
           <div className="flex items-center">
@@ -280,7 +287,7 @@ export default function RecentSearches() {
           >
             <div className="container py-8">
               <h1 className="text-2xl font-bold mb-6">Recent Searches</h1>
-              <div className="space-y-4">
+              {user ? <div className="space-y-4">
                 {recentSearches ? (
                   recentSearches.map((search) => (
                     <Button
@@ -325,7 +332,7 @@ export default function RecentSearches() {
                     by artist or genre to begin
                   </p>
                 )}
-              </div>
+              </div> : <p className="text-center text-muted-foreground">You must be signed in to view your recent searches.</p>}
             </div>
           </div>
         </main>
