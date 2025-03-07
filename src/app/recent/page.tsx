@@ -222,6 +222,7 @@ export default function RecentSearches() {
               alt="Melodate Icon"
               width={20}
               height={20}
+              loading="lazy"
             />
             <h1 className="text-xl font-bold tracking-tight">Melodate</h1>
           </Link>

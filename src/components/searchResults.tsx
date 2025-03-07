@@ -43,6 +43,7 @@ export default function SearchResultItem({
               fill
               className="object-cover transition-transform group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              loading="lazy"
             />
             <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Button
@@ -96,6 +97,7 @@ export default function SearchResultItem({
               className="object-cover rounded-md"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={id === 0}
+              loading="lazy"
             />
           </div>
           <div className="flex-grow min-w-0">
