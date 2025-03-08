@@ -291,6 +291,35 @@ export default function SearchResults() {
         onClose={() => setCreateAccountModalOpen(false)}
         onSwitchToLogin={handleSwitchToLogin}
       />
+      <footer className="border-t bg-muted relative z-50">
+        <div className="container py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} Melodate. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Contact Us
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

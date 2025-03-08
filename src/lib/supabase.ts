@@ -65,3 +65,79 @@ export async function getRecentSearches(userId: string) {
 
   return data;
 }
+
+export async function addLike(userId: string, item: {
+  id: string;
+  title: string;
+  artist: string;
+  coverArt: string;
+  type: string;
+  url: string;
+}) {
+  try {
+    const { error } = await supabase
+      .from('likes')
+      .insert({
+        user_id: userId,
+        item_id: item.id,
+        title: item.title,
+        artist: item.artist,
+        cover_art: item.coverArt,
+        type: item.type,
+        spotify_url: item.url
+      });
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error adding like:', error);
+    throw error;
+  }
+}
+
+export async function removeLike(userId: string, itemId: string) {
+  try {
+    const { error } = await supabase
+      .from('likes')
+      .delete()
+      .match({ user_id: userId, item_id: itemId });
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error removing like:', error);
+    throw error;
+  }
+}
+
+export async function getLikes(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error fetching likes:', error);
+    throw error;
+  }
+}
+
+export async function checkIfLiked(userId: string, itemId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('likes')
+      .select('id')
+      .match({ user_id: userId, item_id: itemId })
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error;
+    return !!data;
+  } catch (error) {
+    console.error('Error checking like status:', error);
+    throw error;
+  }
+}

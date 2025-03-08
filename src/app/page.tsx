@@ -147,6 +147,8 @@ export default function Home() {
     queryFn: fetchRecommended,
   });
 
+  
+
   const handleLoginSuccess = (userData: any) => {
     setUser(userData); // Set user data on successful login
     localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
@@ -237,6 +239,7 @@ export default function Home() {
                     category="Trending"
                     data={trending?.tracks?.items.map((item: any) => item.track)}
                     isLoading={trendingLoading}
+                    user={user}
                   />
                 </TabsContent>
 
@@ -245,6 +248,7 @@ export default function Home() {
                     category="New Releases"
                     data={newReleases?.albums?.items}
                     isLoading={newReleasesLoading}
+                    user={user}
                   />
                 </TabsContent>
 
@@ -253,6 +257,7 @@ export default function Home() {
                     category="Top Rated"
                     data={topRated?.tracks?.items.map((item: any) => item.track)}
                     isLoading={topRatedLoading}
+                    user={user}
                   />
                 </TabsContent>
 
@@ -261,6 +266,7 @@ export default function Home() {
                     category="Recommended"
                     data={recommended?.tracks?.items.map((item: any) => item.track)}
                     isLoading={recommendedLoading}
+                    user={user}
                   />
                 </TabsContent>
               </Tabs>
@@ -273,6 +279,7 @@ export default function Home() {
                         {trending?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
+                              id={item.id || item.track.id}
                               title={item.name || item.track.name}
                               artist={
                                 item.artists
@@ -291,6 +298,7 @@ export default function Home() {
                                 item.external_urls?.spotify ||
                                 item.track?.external_urls?.spotify
                               }
+                              type={item.type}
                             />
                           </CarouselItem>
                         ))}
@@ -309,12 +317,14 @@ export default function Home() {
                         {newReleases?.albums?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
+                              id={item.id}
                               title={item.name}
                               artist={item.artists
                                 .map((artist: any) => artist.name)
                                 .join(", ")}
-                              coverArt={item.images[0]?.url}
+                              coverArt={item.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.external_urls.spotify}
+                              type={item.album_type}
                             />
                           </CarouselItem>
                         ))}
@@ -333,12 +343,14 @@ export default function Home() {
                         {topRated?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
+                              id={item.track.id}
                               title={item.track.name}
                               artist={item.track.artists
                                 .map((artist: any) => artist.name)
                                 .join(", ")}
-                              coverArt={item.track.album.images[0]?.url}
+                              coverArt={item.track.album?.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.track.external_urls.spotify}
+                              type={item.track.type}
                             />
                           </CarouselItem>
                         ))}
@@ -357,12 +369,14 @@ export default function Home() {
                         {recommended?.tracks?.items.map((item: any, index: any) => (
                           <CarouselItem key={index} className="pl-2 basis-[45%]">
                             <MusicCard
+                              id={item.track.id}
                               title={item.track.name}
                               artist={item.track.artists
                                 .map((artist: any) => artist.name)
                                 .join(", ")}
-                              coverArt={item.track.album.images[0]?.url}
+                              coverArt={item.track.album?.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.track.external_urls.spotify}
+                              type={item.track.type}
                             />
                           </CarouselItem>
                         ))}
