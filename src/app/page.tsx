@@ -388,7 +388,7 @@ export default function Home() {
         onClose={() => setCreateAccountModalOpen(false)}
         onSwitchToLogin={handleSwitchToLogin}
       />
-      <footer className="border-t bg-muted/40">
+      <footer className="border-t bg-muted relative z-50">
         <div className="container py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">

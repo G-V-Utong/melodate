@@ -97,7 +97,7 @@ export default function SearchResultItem({
               className="object-cover rounded-md"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               priority={id === 0}
-              loading="lazy"
+              loading={id != 0 ? "lazy": "eager"}
             />
           </div>
           <div className="flex-grow min-w-0">
