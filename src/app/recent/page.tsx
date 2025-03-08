@@ -254,8 +254,6 @@ export default function RecentSearches() {
           <div className="flex items-center">
             <AuthButton
               onLoginClick={() => setLoginModalOpen(true)}
-              user={user}
-              handleLogout={handleLogout}
             />
             <div className="lg:hidden">
               <MenuButton
@@ -342,7 +340,6 @@ export default function RecentSearches() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToCreateAccount={handleSwitchToCreateAccount}
-        onLoginSuccess={handleLoginSuccess}
       />
       <CreateAccountModal
         isOpen={createAccountModalOpen}
