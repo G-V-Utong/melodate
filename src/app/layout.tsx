@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 import { Suspense } from "react";
+import { AuthProvider } from "@/components/contexts/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
+  metadataBase: new URL("https://melodate.com.ng"),
   title: "Melodate",
   description:
     "Search for songs and music albums by date. You can now discover music from your favourite genres during certain time periods.",
@@ -25,10 +27,10 @@ export const metadata = {
     siteName: "Melodate",
     images: [
       {
-      url: "/assets/iPad Pro 12.9_ - 1.png",
-      width: 1260,
-      height: 800
-      }
+        url: "/assets/iPad Pro 12.9_ - 1.png",
+        width: 1260,
+        height: 800,
+      },
     ],
     locale: "en-EN",
   },
@@ -45,7 +47,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <Suspense>{children}</Suspense>
+          <Suspense>
+            <AuthProvider>{children}</AuthProvider>
+          </Suspense>
         </Providers>
       </body>
     </html>

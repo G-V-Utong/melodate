@@ -49,7 +49,7 @@ export const fetchTrending = () => fetchSpotifyData("/playlists/6xwBhWuFwOySNZtx
 export const fetchNewReleases = () => fetchSpotifyData("/browse/new-releases");
 
 // Fetch Top Rated (Based on popular albums)
-export const fetchTopRated = () => fetchSpotifyData("/playlists/5ABHKGoOzxkaa28ttQV9sE");
+export const fetchTopRated = () => fetchSpotifyData("/playlists/5iwkYfnHAGMEFLiHFFGnP4");
 
 // Fetch Recommended (Based on genre or category)
 export const fetchRecommended = () => fetchSpotifyData("/playlists/5TZ11Thajwh0Udh4nTqit2");

@@ -61,7 +61,7 @@ export default function MusicGrid(
         JSON.stringify({ ...likedSongs, [id]: !isCurrentlyLiked })
       );
     } catch (error: any) {
-      toast.error("Failed to update likes");
+      toast.error(error.message === 'duplicate key value violates unique constraint "unique_user_item"' ? "Already liked" : "Failed to update likes");
     }
   };
   

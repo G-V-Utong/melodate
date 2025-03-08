@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { User } from "@supabase/supabase-js"
 import { Badge } from "@/components/ui/badge"
 import { AiOutlineSpotify } from "react-icons/ai"
+import { useAuth } from "@/components/contexts/AuthContext";
 
 interface MusicCardProps {
   id: string
@@ -24,7 +25,13 @@ interface MusicCardProps {
 
 export function MusicCard({ id, title, artist, coverArt, url, type }: MusicCardProps) {
   const [isLiked, setIsLiked] = useState(false)
-  const [user, setUser] = useState<User | null>(null)
+  const { user } = useAuth();
+
+  useEffect(() => {
+      if (user) {
+        checkIfLiked(user.id, id).then(setIsLiked)
+      }
+    }, [id])
 
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault() // Prevent navigation if card is clickable
@@ -51,7 +58,7 @@ export function MusicCard({ id, title, artist, coverArt, url, type }: MusicCardP
       }
       setIsLiked(!isLiked)
     } catch (error: any) {
-      toast.error("Failed to update likes:", error.message)
+      toast.error(error.message === 'duplicate key value violates unique constraint "unique_user_item"' ? "Already liked" : "Failed to update likes");
     }
   }
 

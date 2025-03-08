@@ -1,20 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "@/components/search-bar";
 import SearchResultItem from "@/components/searchResults";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import LoginModal from "@/components/login-modal";
 import CreateAccountModal from "@/components/create-account-modal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AlbumResultItem from "@/components/albumResults";
 import AuthButton from "@/components/auth-button";
 import MenuButton from "@/components/menuButton";
-import { supabase } from "@/lib/supabase";
+import { addLike, removeLike, supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 const fetchReleases = async (filters: {
   dateRange?: { from?: string; to?: string };
@@ -30,19 +31,43 @@ const fetchReleases = async (filters: {
 };
 
 export default function SearchResults() {
-  // State to hold search filters (passed from SearchBar or URL)
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
-  const type = searchParams.get("type") || "genre"; // Default to genre
+  const type = searchParams.get("type") || "genre";
   const from = searchParams.get("from") || undefined;
   const to = searchParams.get("to") || undefined;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
+  const [likedSongs, setLikedSongs] = useState<Record<string, boolean>>({});
+  const router = useRouter();
+
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  // Fetch initial likes from Supabase when the user is available
+  useEffect(() => {
+    const fetchLikes = async () => {
+      if (!user) return;
+      try {
+        const { data: likes, error } = await supabase
+          .from("likes")
+          .select("item_id")
+          .eq("user_id", user.id);
+        if (error) throw error;
+        const likedIds = likes.reduce((acc, like) => {
+          acc[like.item_id] = true;
+          return acc;
+        }, {} as Record<string, boolean>);
+        setLikedSongs(likedIds);
+      } catch (error) {
+        console.error("Error fetching likes:", error);
+      }
+    };
+    fetchLikes();
+  }, [user]);
 
   const handleSwitchToCreateAccount = () => {
     setLoginModalOpen(false);
@@ -55,7 +80,8 @@ export default function SearchResults() {
   };
 
   const handleLoginSuccess = (userData: any) => {
-    setUser(userData); // Set user data on successful login
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const { data, isLoading, refetch } = useQuery({
@@ -65,26 +91,24 @@ export default function SearchResults() {
         dateRange: { from, to },
         [type]: query || undefined,
       }),
-    enabled: !!query || !!from || !!to, // Only fetch if there's a query or date range
+    enabled: !!query || !!from || !!to,
   });
-  // Map Spotify API results to SearchResultItem props
+
   const results = data?.releases || [];
-
   const uniqueAlbumInfo: any = [];
-  const uniqueIds = new Set(); // Use a Set to track unique IDs
+  const uniqueIds = new Set();
 
-  const albumInfo = results
+  results
     ?.filter(
       (item: any) =>
         item.album?.album_type === "album" || item.album_type === "album"
     )
     ?.forEach((item: any) => {
-      const title = item.album?.name; // Use a unique identifier (e.g., `id` or `name`)
+      const title = item.album?.name;
       if (!uniqueIds.has(title)) {
-        // Check if the item is already in the Set
-        uniqueIds.add(title); // Add the ID to the Set
+        uniqueIds.add(title);
         uniqueAlbumInfo.push({
-          // Add the item to the array
+          id: item.id || item.album?.id,
           title: item.album?.name,
           artist: (item.artists || item.album?.artists || [])
             .map((a: any) => a.name)
@@ -106,7 +130,7 @@ export default function SearchResults() {
 
   const trackInfo =
     results?.map((item: any, index: number) => ({
-      id: index, // Use index as a temporary ID since Spotify IDs might not be unique across types
+      id: index,
       title: item.name,
       artist: item.artists.map((a: any) => a.name).join(", "),
       album: item.type === "album" ? item.name : item.album.name,
@@ -114,7 +138,7 @@ export default function SearchResults() {
         ? item.release_date.split("-")[0]
         : item.album.release_date
         ? item.album.release_date.split("-")[0]
-        : "Unknown", // Extract year from release_date
+        : "Unknown",
       coverArt:
         item.album?.images[0]?.url ||
         item.images?.[0]?.url ||
@@ -122,7 +146,7 @@ export default function SearchResults() {
       genre:
         item.type === "track" && item.album.genres?.[0]
           ? item.album.genres[0]
-          : "Unknown", // Genre is often unavailable
+          : "Unknown",
       type: item.album_type
         ? item.album_type === "single"
           ? "Track"
@@ -136,9 +160,42 @@ export default function SearchResults() {
     })) || [];
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut({ scope: 'local' })
-    setUser(null); // Clear user state
-    localStorage.removeItem("user"); // Remove user data from localStorage
+    await supabase.auth.signOut({ scope: "local" });
+    setUser(null);
+    localStorage.removeItem("user");
+    router.push("/");
+  };
+
+  const handleLikeClick = async (
+    e: React.MouseEvent,
+    id: number,
+    title: string,
+    artist: string,
+    coverArt: string,
+    type: string,
+    url: string
+  ) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error("You must be logged in to save your likes");
+      return;
+    }
+
+    try {
+      const isCurrentlyLiked = likedSongs[id] || false;
+      if (isCurrentlyLiked) {
+        await removeLike(user.id, id.toString());
+        toast.success("Removed from likes");
+      } else {
+        await addLike(user.id, { id: id.toString(), title, artist, coverArt, type, url });
+        toast.success("Added to likes");
+      }
+
+      setLikedSongs((prev) => ({ ...prev, [id]: !isCurrentlyLiked }));
+    } catch (error: any) {
+      toast.error(error.message === 'duplicate key value violates unique constraint "unique_user_item"' ? "Already liked" : "Failed to update likes");
+    }
   };
 
   return (
@@ -160,33 +217,19 @@ export default function SearchResults() {
             <Link href="/" className="text-sm font-medium hover:text-primary">
               Home
             </Link>
-            {user ? (
-              <a
-                href="/recent"
-                className="text-sm font-medium hover:text-primary"
-              >
+            {user && (
+              <a href="/recent" className="text-sm font-medium hover:text-primary">
                 Recent Searches
               </a>
-            ) : (
-              ""
             )}
-            {user ? (
-              <a
-                href="/likes"
-                className="text-sm font-medium hover:text-primary"
-              >
+            {user && (
+              <a href="/likes" className="text-sm font-medium hover:text-primary">
                 My Likes
               </a>
-            ) : (
-              ""
             )}
           </nav>
           <div className="flex items-center">
-            <AuthButton
-              onLoginClick={() => setLoginModalOpen(true)}
-              user={user}
-              handleLogout={handleLogout}
-            />
+            <AuthButton onLoginClick={() => setLoginModalOpen(true)} />
             <div className="lg:hidden">
               <MenuButton
                 user={user}
@@ -198,7 +241,7 @@ export default function SearchResults() {
       </header>
       <header className="sticky top-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container py-4">
-          <SearchBar refetch={refetch} /> {/* Pass refetch to SearchBar */}
+          <SearchBar refetch={refetch} />
         </div>
       </header>
 
@@ -208,19 +251,15 @@ export default function SearchResults() {
           <p className="text-xs text-muted-foreground">
             {isLoading
               ? "Loading..."
-              : `${
-                  results.length + uniqueAlbumInfo.length
-                } results for "${query}"`}
+              : `${results.length + uniqueAlbumInfo.length} results for "${query}"`}
           </p>
         </div>
 
         {isLoading ? (
-          <div className="text-center text-muted-foreground">
-            Loading results...
-          </div>
+          <div className="text-center text-muted-foreground">Loading results...</div>
         ) : results.length > 0 ? (
           <div>
-            {uniqueAlbumInfo && (
+            {uniqueAlbumInfo.length > 0 && (
               <h1 className="md:text-2xl font-bold my-4">Albums</h1>
             )}
             <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
@@ -230,10 +269,8 @@ export default function SearchResults() {
                     id: number;
                     title: string;
                     artist: string;
-                    album: string;
                     year: string;
                     coverArt: string;
-                    genre: string;
                     type: string;
                     url: string;
                   },
@@ -242,11 +279,13 @@ export default function SearchResults() {
                   <AlbumResultItem
                     key={`${albumInfo.title}-${index}`}
                     {...albumInfo}
+                    isLiked={!!likedSongs[albumInfo.id]} // Pass isLiked state
+                    handleLikeClick={handleLikeClick}
                   />
                 )
               )}
             </div>
-            {trackInfo && (
+            {trackInfo.length > 0 && (
               <h1 className="md:text-2xl font-bold mt-10 mb-4">Tracks</h1>
             )}
             <div className="md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:space-y-0">
@@ -284,7 +323,6 @@ export default function SearchResults() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToCreateAccount={handleSwitchToCreateAccount}
-        onLoginSuccess={handleLoginSuccess}
       />
       <CreateAccountModal
         isOpen={createAccountModalOpen}
@@ -298,22 +336,13 @@ export default function SearchResults() {
               © {new Date().getFullYear()} Melodate. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
                 Privacy Policy
               </a>
-              <a
-                href="#"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
                 Terms of Service
               </a>
-              <a
-                href="#"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
                 Contact Us
               </a>
             </div>

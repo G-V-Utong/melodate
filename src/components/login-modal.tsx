@@ -2,7 +2,7 @@
 "use client"
 
 import type React from "react"
-
+import { useAuth } from "@/components/contexts/AuthContext";
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -25,10 +25,11 @@ interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   onSwitchToCreateAccount: () => void;
-  onLoginSuccess: (user: any) => void;
+  // onLoginSuccess: (user: any) => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, onLoginSuccess }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount }: LoginModalProps) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -48,7 +49,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToCreateAccount, o
 
       if (data.user) {
         toast.success('Logged in successfully')
-        onLoginSuccess(data.user)
+        login(data.user)
+        // onLoginSuccess(data.user)
         onClose()
       }
     } catch (error: any) {

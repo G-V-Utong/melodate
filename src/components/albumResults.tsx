@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Play, Heart, MoreHorizontal } from "lucide-react";
+import { Play, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,15 +18,28 @@ interface AlbumResultItemProps {
   coverArt: string;
   type: string;
   url: string;
+  isLiked: boolean;
+  handleLikeClick: (
+    e: React.MouseEvent,
+    id: number,
+    title: string,
+    artist: string,
+    coverArt: string,
+    type: string,
+    url: string
+  ) => Promise<void>;
 }
 
 export default function AlbumResultItem({
+  id,
   title,
   artist,
   year,
   coverArt,
   type,
   url,
+  isLiked, 
+  handleLikeClick,
 }: AlbumResultItemProps) {
   return (
     <>
@@ -49,7 +62,7 @@ export default function AlbumResultItem({
                 variant="secondary"
                 className="rounded-full flex items-center justify-center gap-1 px-2 py-1 transition-all duration-300 group-hover:w-20 bg-[#1DB954] hover:bg-[#1DB954]"
               >
-                <AiOutlineSpotify className="h-5 w-5 transition-all duration-300 group-hover:translate-x-0 " />
+                <AiOutlineSpotify className="h-5 w-5 transition-all duration-300 group-hover:translate-x-0" />
                 <span className="text-xs opacity-0 scale-x-0 whitespace-nowrap transition-all duration-300 group-hover:opacity-100 group-hover:scale-x-100 group-hover:translate-x-0">
                   Spotify
                 </span>
@@ -73,11 +86,17 @@ export default function AlbumResultItem({
             <span className="text-xs text-muted-foreground">{year}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Heart className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) =>
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url)
+              }
+            >
+              <Heart
+                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+              />
             </Button>
           </div>
         </CardFooter>
@@ -110,8 +129,16 @@ export default function AlbumResultItem({
             <Button size="icon" variant="ghost">
               <Play className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost">
-              <Heart className="h-4 w-4" />
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) =>
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url)
+              }
+            >
+              <Heart
+                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+              />
             </Button>
           </div>
         </div>

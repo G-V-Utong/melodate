@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
+
+import { useAuth } from "@/components/contexts/AuthContext";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -65,12 +67,8 @@ export default function Home() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
-  const [user, setUser] = useState(null);
-    // Retrieve user data from localStorage on initial render
-    useEffect(() => {
-      const savedUser = localStorage.getItem("user");
-      setUser(savedUser ? JSON.parse(savedUser) : null);
-    }, []);
+  const { user, loading, logout } = useAuth();
+    
 
   const handleSwitchToCreateAccount = () => {
     setLoginModalOpen(false);
@@ -149,10 +147,10 @@ export default function Home() {
 
   
 
-  const handleLoginSuccess = (userData: any) => {
-    setUser(userData); // Set user data on successful login
-    localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
-  };
+  // const handleLoginSuccess = (userData: any) => {
+  //   setUser(userData); // Set user data on successful login
+  //   localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
+  // };
 
   // const checkLoggedUser = async () => {
   //   const { data: session } = await supabase.auth.getSession();
@@ -160,14 +158,12 @@ export default function Home() {
   // }
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut({ scope: 'local' })
-    setUser(null); // Clear user state
-    localStorage.removeItem("user"); // Remove user data from localStorage
+    await logout();
   };
 
-  // useEffect(()=> {
-  //   checkLoggedUser()
-  // }, [])
+  useEffect(()=> {
+    console.log(user)
+  }, [])
 
   
 
@@ -190,8 +186,6 @@ export default function Home() {
           <div className="flex items-center">
             <AuthButton
               onLoginClick={() => setLoginModalOpen(true)}
-              user={user}
-              handleLogout={handleLogout}
             />
            {user && <div className="lg:hidden">
            <MenuButton
@@ -395,7 +389,7 @@ export default function Home() {
         isOpen={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
         onSwitchToCreateAccount={handleSwitchToCreateAccount}
-        onLoginSuccess={handleLoginSuccess}
+        // onLoginSuccess={handleLoginSuccess}
       />
       <CreateAccountModal
         isOpen={createAccountModalOpen}

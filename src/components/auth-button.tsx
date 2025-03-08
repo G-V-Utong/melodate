@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
+import { useAuth } from "@/components/contexts/AuthContext";
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -15,24 +16,10 @@ import { supabase } from "@/lib/supabase"
 
 interface AuthButtonProps {
   onLoginClick: () => void
-  user?: any
-  handleLogout: () => void
 }
 
-export default function AuthButton({ onLoginClick, user, handleLogout }: AuthButtonProps) {
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setLoading(false)
-    })
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+export default function AuthButton({ onLoginClick }: AuthButtonProps) {
+  const { user, loading, logout } = useAuth();
 
 
   if (loading) {
@@ -62,7 +49,7 @@ export default function AuthButton({ onLoginClick, user, handleLogout }: AuthBut
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem className="font-medium">{user.email}</DropdownMenuItem>
-        <DropdownMenuItem onClick={handleLogout}>Sign out</DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

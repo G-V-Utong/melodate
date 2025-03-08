@@ -13,6 +13,10 @@ import { Sidebar } from "@/components/sidebar"
 import { cn } from "@/lib/utils"
 import MenuButton from "@/components/menuButton"
 import type { User } from '@supabase/supabase-js'
+import LoginModal from "@/components/login-modal"
+import CreateAccountModal from "@/components/create-account-modal"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/components/contexts/AuthContext";
 
 interface Like {
   item_id: string;
@@ -26,32 +30,48 @@ interface Like {
 export default function Likes() {
   const [likes, setLikes] = useState<Like[]>([])
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
+  const { user, loading: authLoading, logout } = useAuth();
+  const router = useRouter()
+
+  const handleSwitchToCreateAccount = () => {
+    setLoginModalOpen(false);
+    setCreateAccountModalOpen(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setCreateAccountModalOpen(false);
+    setLoginModalOpen(true);
+  };
+
+  // const handleLoginSuccess = (userData: any) => {
+  //   setUser(userData); // Set user data on successful login
+  // };
 
   useEffect(() => {
     async function fetchLikes() {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (user) {
-          setUser(user)
-          const likesData = await getLikes(user.id)
-          setLikes(likesData)
-        }
+        const likesData = await getLikes(user.id);
+        setLikes(likesData);
       } catch (error) {
-        toast.error("Error fetching likes")
+        toast.error("Error fetching likes");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
-
-    fetchLikes()
-  }, [])
+    fetchLikes();
+  }, [user]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
-    setUser(null)
+    await logout();
+    router.push('/')
+    console.log(user)
   }
 
   return (
@@ -70,9 +90,7 @@ export default function Likes() {
           </Link>
           <div className="flex items-center gap-4">
             <AuthButton
-              onLoginClick={() => {}}
-              user={user}
-              handleLogout={handleLogout}
+              onLoginClick={() => setLoginModalOpen(true)}
             />
             <div className="lg:hidden">
               <MenuButton
@@ -120,6 +138,17 @@ export default function Likes() {
           </div>
         </main>
       </div>
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSwitchToCreateAccount={handleSwitchToCreateAccount}
+        // onLoginSuccess={handleLoginSuccess}
+      />
+      <CreateAccountModal
+        isOpen={createAccountModalOpen}
+        onClose={() => setCreateAccountModalOpen(false)}
+        onSwitchToLogin={handleSwitchToLogin}
+      />
       <footer className="border-t bg-muted relative z-50">
         <div className="container py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
