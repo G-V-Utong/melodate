@@ -88,7 +88,7 @@ export default function Likes() {
             />
             <span className="text-xl font-bold">Melodate</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <AuthButton
               onLoginClick={() => setLoginModalOpen(true)}
             />

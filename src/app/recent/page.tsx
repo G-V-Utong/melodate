@@ -295,19 +295,19 @@ export default function RecentSearches() {
                       className="w-full justify-start text-left py-8"
                       onClick={() => handleSearchClick(search)}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         {search.search_type === "date" ? (
                           <Calendar className="h-4 w-4" />
                         ) : (
                           <Search className="h-4 w-4" />
                         )}
                         <div>
-                          <p className="font-medium">
+                          <p className="font-medium mb-1">
                             {capitalizeWords(search.query) || "Date Search"}
                           </p>
-                          <div className="text-xs text-muted-foreground flex justify-between w-full">
-                            {search.date_range?.from && (
-                              <p>
+                          <div className="text-xs text-muted-foreground md:flex md:justify-between w-full">
+                            {search.date_range?.from ? (
+                              <p className="mb-1 md:mb-0">
                                 {format(new Date(search.date_range.from), "PP")}
                                 {search.date_range.to &&
                                   ` - ${format(
@@ -315,8 +315,8 @@ export default function RecentSearches() {
                                     "PP"
                                   )}`}
                               </p>
-                            )}
-                            <p className="ml-2 text-right">
+                            ) : <p className="mb-1 md:mb-0">No date provided</p>}
+                            <p className="md:ml-2 md:text-right">
                               Searched:{" "}
                               {format(new Date(search.created_at), "PP")}
                             </p>
