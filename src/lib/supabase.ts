@@ -73,6 +73,7 @@ export async function addLike(userId: string, item: {
   coverArt: string;
   type: string;
   url: string;
+  year: number
 }) {
   try {
     const { error } = await supabase
@@ -84,7 +85,8 @@ export async function addLike(userId: string, item: {
         artist: item.artist,
         cover_art: item.coverArt,
         type: item.type,
-        spotify_url: item.url
+        spotify_url: item.url,
+        year: item.year
       });
 
     if (error) throw error;

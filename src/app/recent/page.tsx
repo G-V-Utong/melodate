@@ -353,24 +353,24 @@ export default function RecentSearches() {
               © {new Date().getFullYear()} Melodate. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
+            <Link
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Terms of Service
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/contact"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>

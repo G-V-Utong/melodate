@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Play, Heart, MoreHorizontal } from "lucide-react";
+import { Play, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,10 +15,21 @@ interface SearchResultItemProps {
   title: string;
   artist: string;
   album: string;
-  year: string;
+  year: number;
   coverArt: string;
   type: string;
   url: string;
+  isLiked: boolean;
+  handleLikeClick: (
+    e: React.MouseEvent,
+    id: number,
+    title: string,
+    artist: string,
+    coverArt: string,
+    type: string,
+    url: string,
+    year: number,
+  ) => Promise<void>;
 }
 
 export default function SearchResultItem({
@@ -30,6 +41,8 @@ export default function SearchResultItem({
   coverArt,
   type,
   url,
+  isLiked, 
+  handleLikeClick,
 }: SearchResultItemProps) {
   return (
     <>
@@ -76,12 +89,20 @@ export default function SearchResultItem({
             <span className="text-xs text-muted-foreground">{year}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Heart className="h-4 w-4" />
+          <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) =>
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url, year)
+              }
+            >
+              <Heart
+                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+              />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            {/* <Button variant="ghost" size="icon" className="h-8 w-8">
               <MoreHorizontal className="h-4 w-4" />
-            </Button>
+            </Button> */}
           </div>
         </CardFooter>
       </Card>
@@ -111,9 +132,17 @@ export default function SearchResultItem({
             <Button size="icon" variant="ghost">
               <Play className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost">
-              <Heart className="h-4 w-4" />
-            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={(e) =>
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url, year)
+              }
+            >
+              <Heart
+                className={`h-4 w-4 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+              />
+              </Button>
           </div>
         </div>
       </a>

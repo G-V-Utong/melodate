@@ -57,13 +57,6 @@ export default function Home() {
     label: "",
   });
 
-  // const { data, isLoading, refetch } = useQuery({
-  //   queryKey: ["releases", filters],
-  //   queryFn: () => fetchReleases(filters),
-  //   enabled: false, // Trigger manually
-  // });
-
-  // const handleSearch = () => refetch()
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [createAccountModalOpen, setCreateAccountModalOpen] = useState(false);
@@ -145,25 +138,9 @@ export default function Home() {
     queryFn: fetchRecommended,
   });
 
-  
-
-  // const handleLoginSuccess = (userData: any) => {
-  //   setUser(userData); // Set user data on successful login
-  //   localStorage.setItem("user", JSON.stringify(userData)); // Store user data in localStorage
-  // };
-
-  // const checkLoggedUser = async () => {
-  //   const { data: session } = await supabase.auth.getSession();
-  //   const userLogged = session?.session?.user;
-  // }
-
   const handleLogout = async () => {
     await logout();
   };
-
-  useEffect(()=> {
-    console.log(user)
-  }, [])
 
   
 
@@ -292,7 +269,17 @@ export default function Home() {
                                 item.external_urls?.spotify ||
                                 item.track?.external_urls?.spotify
                               }
-                              type={item.type}
+                              type={item.album_type
+                                ? item.album_type === "single"
+                                  ? "Track"
+                                  : "Album"
+                                : item.type
+                                ? item.type === "album"
+                                  ? "Album"
+                                  : "Track"
+                                : "Unknown"}
+                              year={ item.release_date
+                                ? item.release_date.split("-")[0] : "Unknown"}
                             />
                           </CarouselItem>
                         ))}
@@ -318,7 +305,17 @@ export default function Home() {
                                 .join(", ")}
                               coverArt={item.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.external_urls.spotify}
-                              type={item.album_type}
+                              type={item.album_type
+                                ? item.album_type === "single"
+                                  ? "Track"
+                                  : "Album"
+                                : item.type
+                                ? item.type === "album"
+                                  ? "Album"
+                                  : "Track"
+                                : "Unknown"}
+                                year={ item.release_date
+                                  ? item.release_date.split("-")[0] : "Unknown"}
                             />
                           </CarouselItem>
                         ))}
@@ -344,7 +341,17 @@ export default function Home() {
                                 .join(", ")}
                               coverArt={item.track.album?.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.track.external_urls.spotify}
-                              type={item.track.type}
+                              type={item.album_type
+                                ? item.album_type === "single"
+                                  ? "Track"
+                                  : "Album"
+                                : item.type
+                                ? item.type === "album"
+                                  ? "Album"
+                                  : "Track"
+                                : "Unknown"}
+                                year={ item.release_date
+                                  ? item.release_date.split("-")[0] : "Unknown"}
                             />
                           </CarouselItem>
                         ))}
@@ -371,6 +378,8 @@ export default function Home() {
                               coverArt={item.track.album?.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.track.external_urls.spotify}
                               type={item.track.type}
+                              year={ item.release_date
+                                ? item.release_date.split("-")[0] : "Unknown"}
                             />
                           </CarouselItem>
                         ))}
@@ -403,24 +412,24 @@ export default function Home() {
               © {new Date().getFullYear()} Melodate. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
+            <Link
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Terms of Service
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/contact"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>

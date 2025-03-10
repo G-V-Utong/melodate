@@ -14,7 +14,7 @@ interface AlbumResultItemProps {
   id: number;
   title: string;
   artist: string;
-  year: string;
+  year: number;
   coverArt: string;
   type: string;
   url: string;
@@ -26,7 +26,8 @@ interface AlbumResultItemProps {
     artist: string,
     coverArt: string,
     type: string,
-    url: string
+    url: string,
+    year: number,
   ) => Promise<void>;
 }
 
@@ -91,7 +92,7 @@ export default function AlbumResultItem({
               size="icon"
               className="h-8 w-8"
               onClick={(e) =>
-                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url)
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url, year)
               }
             >
               <Heart
@@ -133,7 +134,7 @@ export default function AlbumResultItem({
               size="icon"
               variant="ghost"
               onClick={(e) =>
-                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url)
+                handleLikeClick(e, id, title, artist, coverArt || "/assets/placeholder.svg", type, url, year)
               }
             >
               <Heart

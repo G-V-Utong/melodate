@@ -14,6 +14,7 @@ import { AiOutlineSpotify } from "react-icons/ai";
 import { toast } from "sonner";
 import { addLike, removeLike } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { capitalizeWords } from "@/lib/helperFunctions";
 
 interface MusicGridProps {
   category: string;
@@ -35,7 +36,8 @@ export default function MusicGrid(
     artist: string,
     coverArt: string,
     url: string,
-    type: string
+    type: string,
+    year: number
   ) => {
     e.preventDefault();
   
@@ -51,7 +53,7 @@ export default function MusicGrid(
         await removeLike(user.id, id);
         toast.success("Removed from likes");
       } else {
-        await addLike(user.id, { id, title, artist, coverArt, type, url });
+        await addLike(user.id, { id, title, artist, coverArt, type, url, year });
         toast.success("Added to likes");
       }
   
@@ -157,7 +159,8 @@ export default function MusicGrid(
                     item.album?.images?.[0]?.url ||
                     "/assets/placeholder.svg",
                     item.external_urls.spotify,
-                    item.type || item.album.type
+                    capitalizeWords(item.type) || capitalizeWords(item.album.type),
+                    item.release_date?.split("-")[0] || item.album.release_date?.split("-")[0]
                   )
                 }
               >

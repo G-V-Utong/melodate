@@ -173,7 +173,8 @@ export default function SearchResults() {
     artist: string,
     coverArt: string,
     type: string,
-    url: string
+    url: string,
+    year: number
   ) => {
     e.preventDefault();
 
@@ -188,7 +189,7 @@ export default function SearchResults() {
         await removeLike(user.id, id.toString());
         toast.success("Removed from likes");
       } else {
-        await addLike(user.id, { id: id.toString(), title, artist, coverArt, type, url });
+        await addLike(user.id, { id: id.toString(), title, artist, coverArt, type, url, year });
         toast.success("Added to likes");
       }
 
@@ -269,7 +270,7 @@ export default function SearchResults() {
                     id: number;
                     title: string;
                     artist: string;
-                    year: string;
+                    year: number;
                     coverArt: string;
                     type: string;
                     url: string;
@@ -295,7 +296,7 @@ export default function SearchResults() {
                     id: number;
                     title: string;
                     artist: string;
-                    year: string;
+                    year: number;
                     coverArt: string;
                     type: string;
                     url: string;
@@ -307,6 +308,8 @@ export default function SearchResults() {
                   <SearchResultItem
                     key={`${trackInfo.title}-${index}`}
                     {...trackInfo}
+                    isLiked={!!likedSongs[trackInfo.id]}
+                    handleLikeClick={handleLikeClick}
                   />
                 )
               )}
@@ -336,15 +339,24 @@ export default function SearchResults() {
               © {new Date().getFullYear()} Melodate. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link
+                href="/privacy"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
+              </Link>
+              <Link
+                href="/terms"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
                 Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>

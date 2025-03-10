@@ -25,6 +25,7 @@ interface Like {
   cover_art: string;
   spotify_url: string;
   type: string;
+  year: number;
 }
 
 export default function Likes() {
@@ -71,7 +72,6 @@ export default function Likes() {
   const handleLogout = async () => {
     await logout();
     router.push('/')
-    console.log(user)
   }
 
   return (
@@ -122,6 +122,7 @@ export default function Likes() {
                       coverArt={item.cover_art}
                       url={item.spotify_url}
                       type={item.type}
+                      year={item.year}
                     />
                   ))}
                 </div>
@@ -156,24 +157,24 @@ export default function Likes() {
               © {new Date().getFullYear()} Melodate. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
+            <Link
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Terms of Service
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/contact"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>
