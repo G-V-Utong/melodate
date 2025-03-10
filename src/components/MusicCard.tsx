@@ -65,7 +65,7 @@ export function MusicCard({ id, title, artist, coverArt, url, type, year }: Musi
   }
 
   return (
-    <Card className="overflow-hidden group hidden md:block">
+    <Card className="overflow-hidden group">
   <CardHeader className="p-0">
     <div className="relative aspect-square">
       <Image

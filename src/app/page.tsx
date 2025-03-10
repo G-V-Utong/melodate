@@ -273,13 +273,13 @@ export default function Home() {
                                 ? item.album_type === "single"
                                   ? "Track"
                                   : "Album"
-                                : item.type
-                                ? item.type === "album"
+                                : item.track?.type
+                                ? item.track?.type === "album"
                                   ? "Album"
                                   : "Track"
                                 : "Unknown"}
-                              year={ item.release_date
-                                ? item.release_date.split("-")[0] : "Unknown"}
+                              year={ item?.release_date?.split("-")[0] ||
+                                item?.track?.album?.release_date?.split("-")[0]}
                             />
                           </CarouselItem>
                         ))}
@@ -309,13 +309,13 @@ export default function Home() {
                                 ? item.album_type === "single"
                                   ? "Track"
                                   : "Album"
-                                : item.type
-                                ? item.type === "album"
+                                : item.track?.type
+                                ? item.track?.type === "album"
                                   ? "Album"
                                   : "Track"
                                 : "Unknown"}
-                                year={ item.release_date
-                                  ? item.release_date.split("-")[0] : "Unknown"}
+                                year={item?.release_date?.split("-")[0] ||
+                                  item?.track?.album?.release_date?.split("-")[0]}
                             />
                           </CarouselItem>
                         ))}
@@ -345,13 +345,13 @@ export default function Home() {
                                 ? item.album_type === "single"
                                   ? "Track"
                                   : "Album"
-                                : item.type
-                                ? item.type === "album"
+                                : item.track?.type
+                                ? item.track?.type === "album"
                                   ? "Album"
                                   : "Track"
                                 : "Unknown"}
-                                year={ item.release_date
-                                  ? item.release_date.split("-")[0] : "Unknown"}
+                                year={ item?.release_date?.split("-")[0] ||
+                                  item?.track?.album?.release_date?.split("-")[0]}
                             />
                           </CarouselItem>
                         ))}
@@ -377,9 +377,17 @@ export default function Home() {
                                 .join(", ")}
                               coverArt={item.track.album?.images[0]?.url || "/assets/placeholder.svg"}
                               url={item.track.external_urls.spotify}
-                              type={item.track.type}
-                              year={ item.release_date
-                                ? item.release_date.split("-")[0] : "Unknown"}
+                              type={item.album_type
+                                ? item.album_type === "single"
+                                  ? "Track"
+                                  : "Album"
+                                : item.track?.type
+                                ? item.track?.type === "album"
+                                  ? "Album"
+                                  : "Track"
+                                : "Unknown"}
+                              year={item?.release_date?.split("-")[0] ||
+                                item?.track?.album?.release_date?.split("-")[0]}
                             />
                           </CarouselItem>
                         ))}
