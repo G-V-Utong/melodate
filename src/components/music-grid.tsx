@@ -90,17 +90,15 @@ export default function MusicGrid(
           <Card key={`${item.id}-${index}`} className="overflow-hidden group">
           <CardHeader className="p-0">
             <div className="relative aspect-square">
-              <Image
+              <img
                 src={
                   item.images?.[0]?.url ||
                   item.album?.images?.[0]?.url ||
                   "/assets/placeholder.svg"
                 }
                 alt={`${item.name} by ${item.artist}`}
-                fill
                 className="object-cover transition-transform group-hover:scale-105"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                priority={index === 0}
                 loading={index != 0 ? "lazy" : "eager"}
               />
               <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

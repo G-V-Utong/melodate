@@ -33,7 +33,7 @@ export default function ContactPage() {
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link href={"/"} className="cursor-pointer flex items-center gap-1">
-            <Image
+            <img
               className="text-primary"
               src="/assets/Melodate Icon.jpg"
               alt="Melodate Icon"

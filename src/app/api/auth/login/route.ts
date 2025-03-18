@@ -27,11 +27,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Set session expiration time (1 hour from now)
+    const sessionExpiration = Date.now() + 3600000; // 1 hour in milliseconds
+
     const loggedInUser = NextResponse.json({
       success: true,
-      user: data.user
+      user: data.user,
+      sessionExpiration // Include session expiration timestamp
     });
-    return loggedInUser
+    return loggedInUser;
 
   } catch (error) {
     if (error instanceof z.ZodError) {

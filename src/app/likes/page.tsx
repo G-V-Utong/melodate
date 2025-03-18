@@ -79,7 +79,7 @@ export default function Likes() {
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Image
+            <img
               src="/assets/Melodate Icon.jpg"
               alt="Melodate"
               width={32}
@@ -109,7 +109,7 @@ export default function Likes() {
           user ? "md:w-[calc(100%-300px)] md:ml-[300px]" : ""
         )}>
           <div className="container">
-            <h1 className="text-2xl font-bold mb-6">Your Liked Songs</h1>
+            <h1 className="text-2xl font-bold mb-6">Your Favorite Music</h1>
             {loading ? <p>Loading...</p> : (user ? (
               likes.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

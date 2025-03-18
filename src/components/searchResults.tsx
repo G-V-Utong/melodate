@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Play, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,10 +49,9 @@ export default function SearchResultItem({
       <Card className="overflow-hidden group hidden md:block">
         <CardHeader className="p-0">
           <div className="relative aspect-square">
-            <Image
+            <img
               src={coverArt || "/assets/placeholder.svg"}
               alt={`${album} cover`}
-              fill
               className="object-cover transition-transform group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
@@ -111,13 +109,11 @@ export default function SearchResultItem({
       <a href={url} target="_blank" rel="noopener noreferrer" className="block md:hidden">
         <div className="flex items-center space-x-4 p-2 bg-card hover:bg-accent rounded-lg transition-colors md:hidden">
           <div className="relative w-16 h-16 flex-shrink-0">
-            <Image
+            <img
               src={coverArt || "/placeholder.svg"}
               alt={`${album} cover`}
-              fill
               className="object-cover rounded-md"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority={id === 0}
               loading={id != 0 ? "lazy": "eager"}
             />
           </div>

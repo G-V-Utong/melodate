@@ -68,10 +68,9 @@ export function MusicCard({ id, title, artist, coverArt, url, type, year }: Musi
     <Card className="overflow-hidden group">
   <CardHeader className="p-0">
     <div className="relative aspect-square">
-      <Image
+      <img
         src={coverArt || "/assets/placeholder.svg"}
         alt={`${type} cover`}
-        fill
         className="object-cover transition-transform group-hover:scale-105"
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         loading="lazy"
